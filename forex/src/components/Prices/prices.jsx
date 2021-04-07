@@ -3,12 +3,12 @@ import React, {Component} from "react";
 export class Prices extends Component{
     constructor(props) {
         super(props);
-        this.prefix = this.props.prefix;
-        this.otherPrefix = this.props.otherPrefix;
+        this.prefix = this.props.prefix? this.props.prefix:'$';
+        this.otherPrefix = this.props.otherPrefix? this.props.otherPrefix:'£';
         this.currency = this.props.currency;
         this.sellingPrice = 1.0;
         this.buyingPrice = 1.0;
-        this.rate = this.props.rate;
+        this.rate = this.props.rate? this.props.rate: 1;
     }
 
     _changeOperationCurrency(operation){ //Sends the Operation and/or Currency for the parent component
@@ -35,8 +35,9 @@ export class Prices extends Component{
 
                     {this.otherPrefix}1=>
                     {this.prefix}{(this.buyingPrice*this.rate).toFixed(3)}
+                </h1>
                     <button className="btn btn-light" type="button"
-                           onClick={() =>this._changeOperationCurrency('Buy')}>Buy!</button></h1>
+                           onClick={() =>this._changeOperationCurrency('Buy')}>Buy</button>
 
                 {/*Sell Button*/}
                 <hr />
@@ -47,8 +48,9 @@ export class Prices extends Component{
                     {this.prefix}1=>
                     {this.otherPrefix}
                     {(this.sellingPrice/this.rate).toFixed(3)}
+            </h1>
                     <button className="btn btn-light" type="button"
-                           onClick={() => this._changeOperationCurrency('Sell')}>Sell!</button></h1>
+                           onClick={() => this._changeOperationCurrency('Sell')}>Sell</button>
             </div>
         </div>)
     }

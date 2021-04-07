@@ -1,3 +1,3 @@
-import {BuySellCard} from "./buysSellCard";
+import {BuySellCard} from "./buySellCard";
 
 export default BuySellCard;

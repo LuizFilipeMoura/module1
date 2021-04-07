@@ -1,32 +1,53 @@
-const webSocketsServerPort = 8001;
-const webSocketServer = require('websocket').server;
-const http = require('http');
+//Imports the libs to be used
 
-// Spinning the http server and the websocketServer server.
-const server = http.createServer();
-server.listen(webSocketsServerPort);
-console.log('listening on port 8001');
+const WebSocket = require('ws');
+const axios = require('axios');
+const TRADE_API = "http://api.currencylayer.com/live?access_key=b1b6ccf70a7b18329dda7bd8f88b225f&currencies=USD,GBP&format=1";
+
+//Open the server
+const wss = new WebSocket.Server({ port: 8001 });
+console.log("Server open in port 8001");
+
+//Handles the connection to the websocket
+wss.on('connection', function connection(ws) {
 
 
-const wsServer = new webSocketServer({
-    httpServer: server
+    // getQuoteRightNow()
+    //     .then(response => {
+    //         rate = response.data.quotes.USDGBP;
+    //         console.log(rate);
+    if(ws){
+        ws.send(rate);    ws.on('message', function incoming(message) {
+            console.log('received: %s', message);
+        });
+    }
+    //     })
+    //     .catch(err => {
+    //         console.log("oppps", err);
+    //     });
+    ready(ws);
 });
 
-const clients = {};
+//Access the trading rate API
+function getQuoteRightNow(){
+    return axios.get(TRADE_API);
+}
+let rate = 0.7;
 
-// This code generates unique userid for everyuser.
-const getUniqueID = () => {
-    const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-    return s4() + s4() + '-' + s4();
+//Set the interval to maintain the value as realtime as possible
+let ready = function(ws) {
+    setInterval(function(){
+        // getQuoteRightNow()
+        //     .then(response => {
+        //         rate = response.data.quotes.USDGBP;
+        //         console.log(rate);
+        if(ws){
+            ws.send(rate);
+        }
+        // })
+        // .catch(err => {
+        //     console.log("oppps", err);
+        // });
+
+    }, 60000);
 };
-
-wsServer.on('request', function (request) {
-    var userID = getUniqueID();
-    console.log((new Date()) + ' Recieved a new connection from origin ' + request.origin + '.');
-
-    // You can rewrite this part of the code to accept only the requests from allowed origin
-    const connection = request.accept(null, request.origin);
-    clients[userID] = connection;
-    console.log('connected: ' + userID + ' in ' + Object.getOwnPropertyNames(clients));
-
-});

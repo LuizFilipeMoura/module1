@@ -3,14 +3,13 @@ import AmountInput from "../AmountCurrencyInput";
 
 
 export class BuySellCard extends Component{
-    constructor(props) {
-        super(props);
-    }
+    // constructor(props) {
+    //     super(props);
+    // }
 
     handleAmount(amount){
         this.props.onAmountSelect(amount);
     }
-
 
     render() {
         return (
@@ -23,7 +22,7 @@ export class BuySellCard extends Component{
                                 {this.props.prefix}
                             </h4>
                             {/*The currency amount Input*/}
-                            <AmountInput onAmountSelect={this.handleAmount.bind(this)}/>
+                            <AmountInput  onAmountSelect={this.handleAmount.bind(this)}/>
                         </div>
                         <button className="btn btn-success">{this.props.operation+'!'}</button>
                     </div>

@@ -1,11 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-// Importa Routes
+// Import Routes
 const pastTrades = require('./routes/pastTrades.route');
 const app = express();
 
-//Acesso à BD
+//Access to the database
 const mongoose = require('mongoose');
 let url = 'mongodb+srv://dbUser:hylcc123@cluster0.6xqax.mongodb.net/myFirstDatabase';
 let mongoDB = process.env.MONGODB_URI || url;
@@ -19,9 +19,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use('/', pastTrades);
 
-//Servidor
-let porto = 8000;
-app.listen(porto, () => {
-    console.log('Servidor em execução no porto: ' + porto);
+//Opens server
+let port = 8000;
+app.listen(port, () => {
+    console.log('Server open in port: ' + port);
 });
 
