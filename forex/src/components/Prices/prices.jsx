@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 
 export class Prices extends Component{
-    constructor(props) {
+    constructor(props) {//Default Values
         super(props);
         this.prefix = this.props.prefix? this.props.prefix:'$';
         this.otherPrefix = this.props.otherPrefix? this.props.otherPrefix:'£';

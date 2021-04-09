@@ -42,7 +42,7 @@ export function Dashboard({rate, onTransaction}){
                 storeTransaction(operationData).then(()=>{
                     onTransaction(newWallet);//Changes the values of the wallet inside the DataBase
                 });
-            }else{
+            }else{//If the operation is not successfull
                 setModalMessage('Operation was NOT sucessfull! You cannot afford that operation');
                 openModal();
             }
@@ -77,13 +77,11 @@ export function Dashboard({rate, onTransaction}){
         setPrefix(prefix);
     }
 
-    // if(rate && rate !== 0)//Maintain the value always true to the websocket
-    // {
-
-        return (
+    return (
         <span>
 
             <div className="vh-100 App">
+                {/*Context API*/}
                 <WalletContext.Provider value={wallet} >
                     <form onSubmit={handleTransaction.bind(this)}>
                         <div className="d-flex justify-content-md-center align-items-center vh-50 form-group row">
@@ -114,6 +112,7 @@ export function Dashboard({rate, onTransaction}){
                     </form>
                 </WalletContext.Provider>
 
+                {/*History Button*/}
                 <div className="row d-flex justify-content-md-center align-items-center vh-50 form-group ">
                     <a href="/history" type="button" className="btn btn-secondary" >Trading History</a>
                 </div>
@@ -135,10 +134,7 @@ export function Dashboard({rate, onTransaction}){
 
             </div>
     </span>
-        );
-    // }
-
-    // return(<div></div>)//Shows nothing, just for to the refreshing function
+    );
 
 
 

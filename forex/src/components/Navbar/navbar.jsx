@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWallet,faDollarSign,faPoundSign } from '@fortawesome/free-solid-svg-icons'
 import WalletContext from "../../context/wallet";
 
+//Icons
 const walletIco = <FontAwesomeIcon icon={faWallet} />;
 const dollarIco = <FontAwesomeIcon icon={faDollarSign} />;
 const poundIco = <FontAwesomeIcon icon={faPoundSign} />;

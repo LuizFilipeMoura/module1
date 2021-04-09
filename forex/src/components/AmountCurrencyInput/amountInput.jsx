@@ -3,9 +3,6 @@ import CurrencyInput from 'react-currency-input-field';
 
 
 export class AmountInput extends Component{
-    // constructor(props) {
-    //     super(props);
-    // }
 
     handleAmount(amount){ // Handle the amount to the parent component
         this.props.onAmountSelect(amount);

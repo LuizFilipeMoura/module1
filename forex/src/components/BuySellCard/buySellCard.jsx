@@ -1,10 +1,9 @@
 import React, {Component} from "react";
 import AmountInput from "../AmountCurrencyInput";
 
-
 export class BuySellCard extends Component{
 
-    handleAmount(amount){
+    handleAmount(amount){// Sends the amount to parent component
         this.props.onAmountSelect(amount);
     }
 

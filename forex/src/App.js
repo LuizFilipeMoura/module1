@@ -44,8 +44,8 @@ export class App extends Component {
             });
     }
 
+    //Updates the value of the wallet and refreshs the view
     handlesTrasaction(wallet){
-        console.log(wallet);
         if(wallet.poundAmount>0 && wallet.dollarAmount>0){
             axios.put(DATABASE_API + '/wallet', wallet)// Updates the wallets values
                 .then(response => {
