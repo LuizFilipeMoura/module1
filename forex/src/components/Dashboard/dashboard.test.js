@@ -2,8 +2,9 @@ import React from "react";
 
 import {Dashboard} from "./dashboard";
 import { render, screen} from "@testing-library/react";
-import {WEBSOCKET} from "../../shared/enviroment";
+import {DATABASE_API, WEBSOCKET} from "../../shared/enviroment";
 import {w3cwebsocket as W3CWebSocket} from "websocket/lib/websocket";
+import axios from "axios";
 
 describe('Dashboard is shown ', () => {
     it('sell buttons appear', () => {
@@ -33,6 +34,5 @@ describe('The dashboard ', () => {
             expect(Number(message.data)).toBeValid()
         };
     });
-
 
 });
