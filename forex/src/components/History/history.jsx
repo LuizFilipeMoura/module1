@@ -45,7 +45,7 @@ export class History extends Component{
 
                             <tr key={index}>
                                 <th scope="row">{index}</th>
-                                <td>{(new Date(trade.date)).toLocaleDateString()}</td>
+                                <td>{(new Date(trade.date)).toLocaleDateString() + ' '+ (new Date(trade.date)).getHours() + ':' + (new Date(trade.date)).getUTCMinutes()}</td>
                                 <td>{trade.currency}</td>
                                 <td>{trade.operation}</td>
                                 <td>{trade.amount}</td>
