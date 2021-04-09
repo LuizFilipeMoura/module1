@@ -20,6 +20,8 @@
     "websocket": "^1.0.33",
     "ws": "latest"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "cors": "^2.8.5"
+  },
   "description": ""
 }

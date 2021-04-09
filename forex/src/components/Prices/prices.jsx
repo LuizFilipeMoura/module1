@@ -33,7 +33,7 @@ export class Prices extends Component{
 
                     {/*Show to the user how much it costs to buy that currency*/}
 
-                    {this.otherPrefix}1=>
+                    {this.otherPrefix}1↦
                     {this.prefix}{(this.buyingPrice*this.rate).toFixed(3)}
                 </h1>
                     <button className="btn btn-light" type="button"
@@ -45,7 +45,7 @@ export class Prices extends Component{
             <h1 className="card-title pricing-card-title">
                     {/*Show to the user the selling price of that currency*/}
 
-                    {this.prefix}1=>
+                    {this.prefix}1↦
                     {this.otherPrefix}
                     {(this.sellingPrice/this.rate).toFixed(3)}
             </h1>

@@ -9,4 +9,5 @@ let PastTradesSchema = new Schema({
     amount: {type: Number, required: true},
 });
 
+//Exports a Mongoose Model have the scheman as a reference
 module.exports = mongoose.model('PastTrades', PastTradesSchema);

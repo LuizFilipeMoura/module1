@@ -3,9 +3,6 @@ import AmountInput from "../AmountCurrencyInput";
 
 
 export class BuySellCard extends Component{
-    // constructor(props) {
-    //     super(props);
-    // }
 
     handleAmount(amount){
         this.props.onAmountSelect(amount);

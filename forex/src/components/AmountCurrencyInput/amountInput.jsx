@@ -16,6 +16,7 @@ export class AmountInput extends Component{
             <div className="w-90">
                 {/*External Library for currency input for React*/}
                 <CurrencyInput
+                    alt="Amount of currency you want to trade"
                     className="w-100"
                     prefix={this.props.prefix}
                     id="input-example"

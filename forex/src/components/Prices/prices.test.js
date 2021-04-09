@@ -16,10 +16,10 @@ describe('The priceComponent shows ', () => {
 
     it('USD price', () => {
         render(<Prices></Prices>);
-        expect(screen.getByText('$1=', { exact: false })).toBeInTheDocument();
+        expect(screen.getAllByText('$1', { exact: false }));
     });
     it('GBP price', () => {
         render(<Prices></Prices>);
-        expect(screen.getByText('£1=', { exact: false })).toBeInTheDocument();
+        expect(screen.getAllByText('£1', { exact: false }));
     })
 });

@@ -8,24 +8,22 @@ const TRADE_API = "http://api.currencylayer.com/live?access_key=b1b6ccf70a7b1832
 const wss = new WebSocket.Server({ port: 8001 });
 console.log("Server open in port 8001");
 
-//Handles the connection to the websocket
+//Handles the connection to the websocket, calls the schedueler caller of the API
 wss.on('connection', function connection(ws) {
 
-
-    // getQuoteRightNow()
-    //     .then(response => {
-    //         rate = response.data.quotes.USDGBP;
-    //         console.log(rate);
-    if(ws){
-        ws.send(rate);    ws.on('message', function incoming(message) {
-            console.log('received: %s', message);
+    getQuoteRightNow()
+        .then(response => {
+            rate = response.data.quotes.USDGBP;
+            console.log(rate);
+            if(ws){
+                ws.send(rate);
+            }
+        })
+        .catch(err => {
+            console.log("oppps", err);
         });
-    }
-    //     })
-    //     .catch(err => {
-    //         console.log("oppps", err);
-    //     });
-    ready(ws);
+
+    schedueler(ws);
 });
 
 //Access the trading rate API
@@ -35,19 +33,19 @@ function getQuoteRightNow(){
 let rate = 0.7;
 
 //Set the interval to maintain the value as realtime as possible
-let ready = function(ws) {
+let schedueler = function(ws) {
     setInterval(function(){
-        // getQuoteRightNow()
-        //     .then(response => {
-        //         rate = response.data.quotes.USDGBP;
-        //         console.log(rate);
-        if(ws){
-            ws.send(rate);
-        }
-        // })
-        // .catch(err => {
-        //     console.log("oppps", err);
-        // });
+        getQuoteRightNow()
+            .then(response => {
+                rate = response.data.quotes.USDGBP;
+                console.log(rate);
+                if(ws){
+                    ws.send(rate);
+                }
+        })
+        .catch(err => {
+            console.log("oppps", err);
+        });
 
-    }, 60000);
+    }, 360000);
 };
