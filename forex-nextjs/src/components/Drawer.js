@@ -43,42 +43,9 @@ const DrawerList = ({props}) => {
         setState({ ...state, [anchor]: open });
     };
 
-    const list = (anchor) => ( // The right side drawer
-        <>
-            <div
-                className={clsx(classes.list, {
-                    [classes.fullList]: anchor === 'top' || anchor === 'bottom',
-                })}
-                role="presentation"
-                onClick={toggleDrawer(anchor, false)}
-                onKeyDown={toggleDrawer(anchor, false)}
-            >
-                <List>
-                    {[profileLabel, bankInfoLabel, historyLabel, withdrawLabel, depositLabel].map((text, index) => (
-                        <ListItem button key={text} onClick={()=> console.log(text)}>
-                            <ListItemIcon>
-                                {index === 0 ? <AccountCircleIcon />
-                                    : index === 1 ? <AccountBalanceIcon />
-                                        : index === 2 ? <HistoryIcon/>
-                                            : index === 3 ? <MonetizationOnIcon/>
-                                                : index === 4 ? <AttachMoneyIcon/>
-                                                    : ''
-
-                                }
-                            </ListItemIcon>
-                            <ListItemText primary={text}  />
-                        </ListItem>
-                    ))}
-                </List>
-                <Divider />
-            </div>
-        </>
-    );
-
     return (
 
         <>
-            {console.log(props)}
             <div
                 className={clsx(classes.list, {
                     [classes.fullList]: 'right' === 'top' || 'right' === 'bottom',
@@ -90,12 +57,12 @@ const DrawerList = ({props}) => {
                 <List>
                     {[profileLabel, bankInfoLabel, historyLabel, withdrawLabel, depositLabel, dashboardLabel].map((text, index) => (
                         <ListItem button key={text} onClick={()=>
-                            router.push(router.locale +'/' + index === 0 ? 'profile'
+                            router.push(router.locale +'/' + (index === 0 ? 'profile'
                                 : index === 1 ? 'bank-info'
                                     : index === 2 ? 'history'
                                         : index === 3 ? 'withdraw'
                                             : index === 4 ? 'deposit'
-                                                : 'dashboard')}>
+                                                : 'dashboard'))}>
                             <ListItemIcon>
                                 {index === 0 ? <AccountCircleIcon />
                                     : index === 1 ? <AccountBalanceIcon />

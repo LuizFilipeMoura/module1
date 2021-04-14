@@ -6,12 +6,14 @@ const q = require('../index');
 const pastTrades_controller = require('../controllers/pastTradesController');
 
 //REST routing.
-// POST stores the new trade and
-// GET list all of them
-router.get('/', (req, res, next) => {
+// PUT stores the new trade and
+// POST list all of them
+router.post('/', (req, res, next) => {
+    console.log('post');
+
     q.push(function () { //Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
-            const result = pastTrades_controller.get(req, res, next)
+            const result = pastTrades_controller.post(req, res, next);
             if(result === -1){
                 reject(result)
             }
@@ -20,10 +22,10 @@ router.get('/', (req, res, next) => {
     });
 });
 //Add a new PastTrade to the DB
-router.post('/', (req, res, next) => {
+router.put('/', (req, res, next) => {
     q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
-            const result = pastTrades_controller.post(req, res, next)
+            const result = pastTrades_controller.put(req, res, next)
             if(result === -1){
                 reject(result)
             }

@@ -10,7 +10,6 @@ export function AppWrapper({ children }) {
     function updateContext(context){
         setClient(context.client);
         setWallet(context.wallet);
-        console.log(context);
     }
 
     return (

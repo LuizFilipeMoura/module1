@@ -1,11 +1,12 @@
 const connect = require('../../dbConnect/db').connect();
 
 //Gets all the past trades for that client
+
 async function post(req, res, next) {
-    console.log(req.body)
+    console.log(req.body);
     if(req.body && req.body.id){
         const client = (await connect);
-        const sql = 'SELECT * FROM pasttrades where client_id = $1';
+        const sql = 'SELECT * FROM withdraws where client_id = $1';
         const values = [ req.body.id];//Query Values
 
         let clientQuery = await client.query(sql, values); //Executes the query
@@ -17,25 +18,18 @@ async function post(req, res, next) {
     }
 }
 
-//Insert a new trade in the trading history
 async function put(req, res, next){
     if(req.body &&
-        req.body.to_currency &&
-        req.body.from_amount &&
-        req.body.to_amount &&
-        req.body.from_currency &&
-        req.body.client_id &&
-        req.body.date ){
+        req.body.amount &&
+        req.body.currency &&
+        req.body.id){
         const client =  (await connect);
-        const sql = 'INSERT INTO pasttrades (to_currency, from_amount, to_amount,from_currency, client_id, date) VALUES ($1,$2,$3,$4,$5,$6);';
+        const sql = 'INSERT INTO withdraws ( client_id, currency, amount) VALUES ($1,$2,$3);';
         console.log(req.body);
         const values = [
-            req.body.to_currency,
-            req.body.from_amount,
-            req.body.to_amount,
-            req.body.from_currency,
-            req.body.client_id,
-            req.body.date];//Query Values
+            req.body.id,
+            req.body.currency,
+            req.body.amount];//Query Values
 
         await client.query(sql, values); //Executes the query
         console.log('success');
@@ -47,5 +41,4 @@ async function put(req, res, next){
     }
 
 }
-
-module.exports = { put, post };
+module.exports = { post, put };

@@ -6,10 +6,13 @@ let queue = require('queue');
 
 let q = queue({ results: [], autostart: true });
 module.exports = q;
+
 // Import Routes
 const pastTrades = require('./routes/pastTrades.route');
 const wallets = require('./routes/wallet.route');
 const clients = require('./routes/client.route');
+const withdraws = require('./routes/withdraw.route');
+const deposits = require('./routes/deposit.route');
 
 const app = express();
 app.use(cors());
@@ -23,6 +26,8 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use('/pasttrades', pastTrades);
 app.use('/wallets', wallets);
 app.use('/clients', clients);
+app.use('/withdraws', withdraws);
+app.use('/deposits', deposits);
 
 
 

@@ -1,17 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const q = require('../index');//The queue for the transactions
-//Importing the controller
-const wallet_controller = require('../controllers/walletController');
+const q = require('../index');
 
+//Importing the controller
+const withdraw_controller = require('../controllers/withdrawController');
 
 //REST routing.
-// POST get the values of the wallet
-// PUT edit the values of the wallet
+// PUT stores the new trade and
+// POST list all of them
 router.post('/', (req, res, next) => {
-    q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
+    console.log('post');
+
+    q.push(function () { //Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
-            const result = wallet_controller.post(req, res, next);
+            const result = deposit_controller.post(req, res, next);
             if(result === -1){
                 reject(result)
             }
@@ -19,12 +21,11 @@ router.post('/', (req, res, next) => {
         })
     });
 });
-
+//Add a new PastTrade to the DB
 router.put('/', (req, res, next) => {
-
     q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
-            const result = wallet_controller.put(req, res, next);
+            const result = deposit_controller.put(req, res, next)
             if(result === -1){
                 reject(result)
             }
