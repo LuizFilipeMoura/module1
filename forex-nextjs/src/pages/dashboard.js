@@ -19,13 +19,9 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import DrawerList from "../components/Drawer";
 import Navbar from "../components/Navbar";
-import {AppWrapper, useAppContext} from "../shared/AppWrapper";
-
-const {useContext} = require("react");
+import { useAppContext} from "../shared/AppWrapper";
 
 const wsClient = new W3CWebSocket(WEBSOCKET); //WebSocket Connection
-
-
 
 const useStyles = makeStyles({//Define the style of the page
     list: {
@@ -48,20 +44,18 @@ const useStyles = makeStyles({//Define the style of the page
 
 export default function Dashboard() {
     const classes = useStyles();
-    const currencies = [['GBP', '£', 'pound'], ['USD', '$', 'dollar'], ['EUR', '€', 'euro'], ['BRL', 'R$', 'real']];
     const [state, setState] = React.useState({
         left: false,
     });
     let [rate, setRate] = useState({});
-    const [client, setClient] = useState(null);
-    let [wallet, setWallet] = useState( {initial: true});
+    let context = useAppContext();
+    let currencies = context.currencies;
 
     let [buyingCurrency, setBuyingCurrency] = React.useState(currencies[0][0]);
     let [sellingCurrency, setSellingCurrency] = React.useState(currencies[1][0]);
     let [buyingAmount, setBuyingAmount] = React.useState(0);
     let [sellingAmount, setSellingAmount] = React.useState(0);
 
-    let context = useAppContext();
     //I18n translations
     let router = useRouter();
 
@@ -73,58 +67,55 @@ export default function Dashboard() {
     let equalsToLabel= router.locale === 'en-US' ? 'equals to' : 'é igual a';
 
     useEffect(() => { //Stores the user in the localstorage
-        context.wallet.dol = 11;
-        console.log(context);
-        if(!client){
-            setClient(JSON.parse(localStorage.getItem('client')));
-        }else{
-            handlesWebsocket();
-            if(wallet.initial){
-                retrievesWallet();
-            }
+        handlesWebsocket();
+        if(Object.entries(context.client).length === 0){
+            context.client = (JSON.parse(localStorage.getItem('client')));
+            context.updateContext(context);
+        }
+        if (Object.entries(context.wallet).length === 0){
+            retrievesWallet();
         }
     });
 
     function retrievesWallet() {//Gets the values of the wallet for that client
-        axios.post(DATABASE_URL + WALLETS, client).then( res => {
-            setWallet(res.data.rows[0]);
-            wallet = res.data.rows[0];
+        axios.post(DATABASE_URL + WALLETS, context.client).then( res => {
+            context.wallet = res.data.rows[0];
+            context.updateContext(context);
         })
     }
 
-    function updatesWallet(givenTransaction){
-        // let transaction = JSON.parse(JSON.stringify(givenTransaction))
-        // console.log(transaction);
+    function updatesWallet(givenTransaction){ // Updates the wallet values for each currency
+
         givenTransaction.from_amount = Number(givenTransaction.from_amount.toFixed(2));
         givenTransaction.to_amount = Number(givenTransaction.to_amount.toFixed(2));
 
         if(givenTransaction.from_currency === 'BRL'){
-            wallet.realamount += givenTransaction.from_amount;
+            context.wallet.realamount += givenTransaction.from_amount;
         }
         else if(givenTransaction.from_currency === 'USD'){
-            wallet.dollaramount += givenTransaction.from_amount;
+            context.wallet.dollaramount += givenTransaction.from_amount;
         }
         else if(givenTransaction.from_currency === 'GBP'){
-            wallet.poundamount += givenTransaction.from_amount;
+            context.wallet.poundamount += givenTransaction.from_amount;
         }
         else if(givenTransaction.from_currency === 'EUR'){
-            wallet.euroamount += givenTransaction.from_amount;
+            context.wallet.euroamount += givenTransaction.from_amount;
         }
 
         if(givenTransaction.to_currency === 'BRL'){
-            wallet.realamount -= givenTransaction.to_amount;
+            context.wallet.realamount -= givenTransaction.to_amount;
         }
         else if(givenTransaction.to_currency === 'USD'){
-            wallet.dollaramount -= givenTransaction.to_amount;
+            context.wallet.dollaramount -= givenTransaction.to_amount;
         }
         else if(givenTransaction.to_currency === 'GBP'){
-            wallet.poundamount -= givenTransaction.to_amount;
+            context.wallet.poundamount -= givenTransaction.to_amount;
         }
         else if(givenTransaction.to_currency === 'EUR'){
-            wallet.euroamount -= givenTransaction.to_amount;
+            context.wallet.euroamount -= givenTransaction.to_amount;
         }
 
-        axios.put(DATABASE_URL + WALLETS, wallet).then( res => {
+        axios.put(DATABASE_URL + WALLETS, context.wallet).then( res => {
             retrievesWallet();
         })
     }
@@ -147,17 +138,17 @@ export default function Dashboard() {
             to_currency: sellingCurrency,
             from_amount: buyingAmount,
             to_amount: sellingAmount,
-            client_id: client.id,
+            client_id: context.client.id,
             date: new Date()
         };
 
-        if(sellingCurrency === 'USD' && sellingAmount > wallet.dollaramount){// Rejects the transaction if the user cant afford
+        if(sellingCurrency === 'USD' && sellingAmount > context.wallet.dollaramount){// Rejects the transaction if the user cant afford
             rejectTransaction()
-        } else if(sellingCurrency === 'BRL' && sellingAmount > wallet.realamount){
+        } else if(sellingCurrency === 'BRL' && sellingAmount > context.wallet.realamount){
             rejectTransaction()
-        }else if(sellingCurrency === 'EUR' && sellingAmount > wallet.euroamount){
+        }else if(sellingCurrency === 'EUR' && sellingAmount > context.wallet.euroamount){
             rejectTransaction()
-        }else if(sellingCurrency === 'GBP' && sellingAmount > wallet.poundamount){
+        }else if(sellingCurrency === 'GBP' && sellingAmount > context.wallet.poundamount){
             rejectTransaction()
         } else{
             console.log('PROSSEGUIU');
@@ -328,13 +319,10 @@ export default function Dashboard() {
         </div>
     );
 
-    if(client){
+    if(context.client){
         return (
             <div>
-                {/*Opens Drawer*/}
-                {/*Amount of each currency the user has in their wallet*/}
-                <Navbar currencies={currencies} wallet={wallet} client={client}/>
-
+                {/*Title*/}
                 <div className="m-2 row">
                     <h1>{dashboardLabel}</h1>
                 </div>

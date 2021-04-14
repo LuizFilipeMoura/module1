@@ -15,6 +15,7 @@ import {useRouter} from "next/router";
 const md5 = require('md5');
 import axios from "axios";
 import {CLIENTS, DATABASE_URL} from "../shared/enviroment";
+import {useAppContext} from "../shared/AppWrapper";
 
 
 const {useState} = require("react");
@@ -65,7 +66,7 @@ export default function SignIn() {
     let [email, setEmail] = useState('');
     let [password, setPassword] = useState('');
 
-
+    let context = useAppContext();
 
     function handleSignIn(event){
         event.preventDefault();
@@ -78,6 +79,8 @@ export default function SignIn() {
                 alert('Wrong Password')
             } else {
                 localStorage.setItem('client', JSON.stringify(res.data));
+                context.client = res.data;
+                context.updateContext(context);
                 router.push(router.locale+'/dashboard');
             }
         })

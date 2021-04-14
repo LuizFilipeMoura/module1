@@ -1,12 +1,15 @@
 import Navbar from "./Navbar";
+import {useAppContext} from "../shared/AppWrapper";
+import React from "react";
 
 const Layout = ({children}) =>{
-        return (
+    let context = useAppContext();
+    return(
         <div>
-            <Navbar></Navbar>
-            {children}
+            <Navbar currencies={context.currencies} wallet={context.wallet} client={context.client}/>
+                {children}
         </div>
     );
-}
+};
 
 export default Layout;

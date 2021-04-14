@@ -32,7 +32,10 @@ export default function MyApp(props) {
                 {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                 <CssBaseline />
                 <AppWrapper>
-                    <Component {...pageProps} />
+                    {/*Provides layout to all child components*/}
+                    <Layout>
+                        <Component {...pageProps} />
+                    </Layout>
                 </AppWrapper>
             </ThemeProvider>
         </>
