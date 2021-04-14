@@ -1,19 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import Button from '@material-ui/core/Button';
-import List from '@material-ui/core/List';
-import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import HistoryIcon from '@material-ui/icons/History';
-import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
-import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
-
 import {useRouter } from "next/router";
 import CardActions from "@material-ui/core/CardActions";
 import Typography from "@material-ui/core/Typography";
@@ -29,6 +17,11 @@ import axios from "axios";
 import {DATABASE_URL, PASTTRADES, WALLETS} from "../shared/enviroment";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+import DrawerList from "../components/Drawer";
+import Navbar from "../components/Navbar";
+import {AppWrapper, useAppContext} from "../shared/AppWrapper";
+
+const {useContext} = require("react");
 
 const wsClient = new W3CWebSocket(WEBSOCKET); //WebSocket Connection
 
@@ -68,6 +61,7 @@ export default function Dashboard() {
     let [buyingAmount, setBuyingAmount] = React.useState(0);
     let [sellingAmount, setSellingAmount] = React.useState(0);
 
+    let context = useAppContext();
     //I18n translations
     let router = useRouter();
 
@@ -77,16 +71,10 @@ export default function Dashboard() {
     let operationLabel = router.locale === 'en-US' ? ['Buying', 'Selling'] : ['Comprando', 'Vendendo'];
     let tradeButtonLabel = router.locale === 'en-US' ? 'TRADE!' : 'NEGOCIAR!';
     let equalsToLabel= router.locale === 'en-US' ? 'equals to' : 'é igual a';
-    let profileLabel= router.locale === 'en-US' ? 'Profile' : 'Perfil';
-    let bankInfoLabel= router.locale === 'en-US' ? 'Bank Info' : 'Informações bancárias';
-    let depositLabel= router.locale === 'en-US' ? 'Deposit' : 'Depositar';
-    let withdrawLabel= router.locale === 'en-US' ? 'Withdraw' : 'Sacar';
-    let historyLabel= router.locale === 'en-US' ? 'History' : 'Histórico';
-
-
 
     useEffect(() => { //Stores the user in the localstorage
-        console.log(router.locale);
+        context.wallet.dol = 11;
+        console.log(context);
         if(!client){
             setClient(JSON.parse(localStorage.getItem('client')));
         }else{
@@ -110,9 +98,6 @@ export default function Dashboard() {
         givenTransaction.from_amount = Number(givenTransaction.from_amount.toFixed(2));
         givenTransaction.to_amount = Number(givenTransaction.to_amount.toFixed(2));
 
-        console.log(givenTransaction);
-        console.log(wallet);
-
         if(givenTransaction.from_currency === 'BRL'){
             wallet.realamount += givenTransaction.from_amount;
         }
@@ -123,7 +108,7 @@ export default function Dashboard() {
             wallet.poundamount += givenTransaction.from_amount;
         }
         else if(givenTransaction.from_currency === 'EUR'){
-            wallet.poundamount += givenTransaction.from_amount;
+            wallet.euroamount += givenTransaction.from_amount;
         }
 
         if(givenTransaction.to_currency === 'BRL'){
@@ -139,11 +124,7 @@ export default function Dashboard() {
             wallet.euroamount -= givenTransaction.to_amount;
         }
 
-        console.log(givenTransaction);
-        console.log(wallet);
-
         axios.put(DATABASE_URL + WALLETS, wallet).then( res => {
-            console.log(res.data);
             retrievesWallet();
         })
     }
@@ -241,47 +222,6 @@ export default function Dashboard() {
     function rejectTransaction(){
         console.log('REJEITOU')
     }
-
-    const toggleDrawer = (anchor, open) => (event) => {//Toggles Side Drawer
-        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-            return;
-        }
-        setState({ ...state, [anchor]: open });
-    };
-
-    const list = (anchor) => ( // The right side drawer
-            <>
-                <div
-                    className={clsx(classes.list, {
-                        [classes.fullList]: anchor === 'top' || anchor === 'bottom',
-                    })}
-                    role="presentation"
-                    onClick={toggleDrawer(anchor, false)}
-                    onKeyDown={toggleDrawer(anchor, false)}
-                >
-                    <List>
-                        {[profileLabel, bankInfoLabel, historyLabel, withdrawLabel, depositLabel].map((text, index) => (
-                            <ListItem button key={text} onClick={()=> console.log(text)}>
-                                <ListItemIcon>
-                                    {index === 0 ? <AccountCircleIcon />
-                                    : index === 1 ? <AccountBalanceIcon />
-                                    : index === 2 ? <HistoryIcon/>
-                                    : index === 3 ? <MonetizationOnIcon/>
-                                    : index === 4 ? <AttachMoneyIcon/>
-                                    : ''
-
-                                    }
-                                </ListItemIcon>
-                                <ListItemText primary={text}  />
-                            </ListItem>
-                        ))}
-                    </List>
-                    <Divider />
-                </div>
-            </>
-    );
-
-
 
     //The input for the values bellow the currencies card
     const buySellCard = () => (
@@ -393,27 +333,7 @@ export default function Dashboard() {
             <div>
                 {/*Opens Drawer*/}
                 {/*Amount of each currency the user has in their wallet*/}
-                <div className="m-2 row ">
-                    {['right'].map((anchor) => (
-                        <React.Fragment key={anchor} >
-                            <Button onClick={toggleDrawer(anchor, true)}>{client?.name}</Button>
-                            <Drawer anchor={anchor} open={state[anchor]} onClose={toggleDrawer(anchor, false)} classes={{paper: classes.paper}} >
-                                {list(anchor)}
-                            </Drawer>
-                        </React.Fragment>
-                    ))}
-                    {currencies.map((currency) => (
-                        <div className="m-2">
-                            <p className="h5" key={currency[0]}>
-                                {/*Gets the symbol*/}
-                                <small>{currency[1]}</small>
-                                {/*Gets the value on the wallet*/}
-                                {wallet[currency[2]+'amount']}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-
+                <Navbar currencies={currencies} wallet={wallet} client={client}/>
 
                 <div className="m-2 row">
                     <h1>{dashboardLabel}</h1>
