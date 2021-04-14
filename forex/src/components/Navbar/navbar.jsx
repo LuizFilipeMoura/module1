@@ -19,6 +19,7 @@ export function Navbar(){
                     <li className="nav-item me-3 me-lg-0">
                         <a className="nav-link">
                             {walletIco}
+
                         </a>
                     </li>
                     {/*The icons and the value in the user's wallet*/}

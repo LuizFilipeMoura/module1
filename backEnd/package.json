@@ -1,11 +1,12 @@
 {
-  "name": "backend",
+  "name": "backend2",
   "version": "1.0.0",
-  "main": "websocketServer/index.js",
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start websockerServer": "node websocketServer/index.js",
-    "start databaseClient": "node databaseClient/index.js"
+    "start database": "node postgresClient/index.js",
+    "start websocket": "node websocketServer/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -14,14 +15,14 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "http": "0.0.1-security",
-    "mongodb": "latest",
-    "mongoose": "^5.12.3",
-    "react-router-dom": "^5.2.0",
+    "money": "^0.2.0",
+    "open-exchange-rates": "^0.3.0",
+    "pg": "^8.5.1",
+    "queue": "^6.0.2",
     "websocket": "^1.0.33",
     "ws": "latest"
   },
   "devDependencies": {
     "cors": "^2.8.5"
-  },
-  "description": ""
+  }
 }

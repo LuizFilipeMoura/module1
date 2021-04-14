@@ -14,6 +14,7 @@ import History from "./components/History";
 import Navbar from "./components/Navbar";
 import WalletContext from "./context/wallet";
 import axios from "axios";
+import {Login} from "./components/Login/login";
 
 const client = new W3CWebSocket(WEBSOCKET); //WebSocket Connection
 
@@ -21,7 +22,7 @@ export class App extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {isLoggedIn: true};
 
     }
 
@@ -60,18 +61,26 @@ export class App extends Component {
     }
 
     render() {
+        const isLoggedIn = this.state.isLoggedIn;
+
             return (
                 <div>
                     <Router>
                         <WalletContext.Provider value={this.state.wallet}/>
-                        <Navbar/>
+                        {isLoggedIn ? (
+                            <Navbar/>
+                        ) : ( <div>
+                            </div>
+                        )}
                         <Switch>
+                            <Route path="/login" component={() =>
+                                <Login/>
+                            }/>
                             <Route path="/history" component={History} />
 
                             <Route path="/" component={() =>
                                     <Dashboard rate={this.state.rate} onTransaction={this.handlesTrasaction.bind(this)}/>
                             }/>
-
 
                         </Switch>
                     </Router>
