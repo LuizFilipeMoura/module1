@@ -46,6 +46,9 @@ export default function History (){
         if(!trades || trades.length ===0){
             listTrades();
         }
+        if(!context.isLogged && !localStorage.getItem('isLogged')){
+            router.push(router.locale+'/')
+        }
     });
 
     function listTrades(){//Lists the trades on the dataBase for that client

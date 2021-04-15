@@ -68,6 +68,9 @@ export default function Deposit() {
         if(!deposits){
             listDeposits();
         }
+        if(!context.isLogged && !localStorage.getItem('isLogged')){
+            router.push(router.locale+'/')
+        }
     });
 
     function listDeposits(){//Lists the deposits on the dataBase for that client
@@ -83,7 +86,7 @@ export default function Deposit() {
 
     function handleDeposit(event){
         event.preventDefault();
-        let request = {id: context.client.id, currency, amount};
+        let request = {id: context.client.id, currency, amount, status: 'PENDING'};
         axios.put(DATABASE_URL + DEPOSITS, request).then( res => {
             sucessful();
             listDeposits();

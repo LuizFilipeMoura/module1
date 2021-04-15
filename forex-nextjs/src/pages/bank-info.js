@@ -66,9 +66,11 @@ export default function BankInfo() {
 
     useEffect(() => { //Stores the user in the localstorage
         if (bankNumber === '' && accountNumber ===''){
-            console.log(context.client);
             setBankNumber(context.client.bank_number);
             setAccountNumber(context.client.account_number);
+        }
+        if(!context.isLogged && !localStorage.getItem('isLogged')){
+            router.push(router.locale+'/')
         }
     });
 

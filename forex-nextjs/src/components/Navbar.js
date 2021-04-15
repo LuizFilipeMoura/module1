@@ -7,6 +7,7 @@ import {useAppContext} from "../shared/AppWrapper";
 import {makeStyles} from "@material-ui/core/styles";
 import axios from "axios";
 import {DATABASE_URL, WALLETS} from "../shared/enviroment";
+import {useRouter} from "next/router";
 
 const useStyles = makeStyles({//Define the style of the page
     list: {
@@ -18,6 +19,7 @@ const useStyles = makeStyles({//Define the style of the page
 });
 
 const Navbar = ({currencies, wallet, client}) => {
+    let router = useRouter();
     let context = useAppContext();
     const classes = useStyles();
     const [state, setState] = React.useState({
@@ -31,6 +33,7 @@ const Navbar = ({currencies, wallet, client}) => {
                 context.updateContext(context);
                 setOnce(false);
             }
+
 
     });
 

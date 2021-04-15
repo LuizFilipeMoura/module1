@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -55,6 +55,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignIn() {
 
+    const [once, setOnce] = React.useState(true);
+
     const classes = useStyles();
 
     const router = useRouter();
@@ -68,6 +70,15 @@ export default function SignIn() {
 
     let context = useAppContext();
 
+    useEffect(() => { //Erases the localStorage
+        if(once){
+            localStorage.clear();
+            context.loggout();
+            setOnce(false);
+        }
+
+    });
+
     function handleSignIn(event){
         event.preventDefault();
 
@@ -79,7 +90,9 @@ export default function SignIn() {
                 alert('Wrong Password')
             } else {
                 localStorage.setItem('client', JSON.stringify(res.data));
+                localStorage.setItem('isLogged', 'true');
                 context.client = res.data;
+                context.login();
                 context.updateContext(context);
                 router.push(router.locale+'/dashboard');
             }

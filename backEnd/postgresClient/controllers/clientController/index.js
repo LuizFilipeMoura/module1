@@ -62,5 +62,13 @@ async function put(req, res, next){
         console.log('success');
         res.send('success');
 }
+async function get(req, res, next){
+    const sql = 'SELECT id,name, email from clients';
+    const client =  (await connect);
+    let result = await client.query(sql); //Executes the query
+    console.log();
+    console.log('success');
+    res.send(result.rows);
+}
 
-module.exports = { signIn, signUp, put };
+module.exports = { signIn, signUp, put, get };

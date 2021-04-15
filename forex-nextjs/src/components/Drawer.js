@@ -7,7 +7,9 @@ import AccountBalanceIcon from "@material-ui/icons/AccountBalance";
 import HistoryIcon from "@material-ui/icons/History";
 import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
+import SendIcon from '@material-ui/icons/Send';
 import DashboardIcon from "@material-ui/icons/Dashboard";
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
 import React from "react";
@@ -35,6 +37,9 @@ const DrawerList = ({props}) => {
     let depositLabel= router.locale === 'en-US' ? 'Deposit' : 'Depositar';
     let withdrawLabel= router.locale === 'en-US' ? 'Withdraw' : 'Sacar';
     let historyLabel= router.locale === 'en-US' ? 'History' : 'Histórico';
+    let logoutLabel= router.locale === 'en-US' ? 'Logout' : 'Sair';
+    let sendMoneyLabel= router.locale === 'en-US' ? 'Send Money' : 'Enviar Dinheiro';
+
 
     const toggleDrawer = (anchor, open) => (event) => {//Toggles Side Drawer
         if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -55,21 +60,26 @@ const DrawerList = ({props}) => {
                 onKeyDown={toggleDrawer('right', false)}
             >
                 <List>
-                    {[profileLabel, bankInfoLabel, historyLabel, withdrawLabel, depositLabel, dashboardLabel].map((text, index) => (
+                    {[profileLabel, bankInfoLabel, historyLabel, withdrawLabel, depositLabel, dashboardLabel,sendMoneyLabel, logoutLabel].map((text, index) => (
                         <ListItem button key={text} onClick={()=>
                             router.push(router.locale +'/' + (index === 0 ? 'profile'
                                 : index === 1 ? 'bank-info'
                                     : index === 2 ? 'history'
                                         : index === 3 ? 'withdraw'
                                             : index === 4 ? 'deposit'
-                                                : 'dashboard'))}>
+                                                : index === 5 ? 'dashboard'
+                                                    : index === 6 ? 'sendmoney'
+                                                        :''))}>
                             <ListItemIcon>
                                 {index === 0 ? <AccountCircleIcon />
                                     : index === 1 ? <AccountBalanceIcon />
                                         : index === 2 ? <HistoryIcon/>
                                             : index === 3 ? <MonetizationOnIcon/>
                                                 : index === 4 ? <AttachMoneyIcon/>
-                                                    : <DashboardIcon/>
+                                                    : index === 5 ?<DashboardIcon/>
+                                                        : index === 6 ?<SendIcon/>
+                                                            : <ExitToAppIcon/>
+
                                 }
                             </ListItemIcon>
                             <ListItemText primary={text}  />

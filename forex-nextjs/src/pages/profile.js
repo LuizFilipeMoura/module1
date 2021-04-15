@@ -16,24 +16,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {useRouter} from "next/router";
 import {CLIENTS, DATABASE_URL} from "../shared/enviroment";
+import {useAppContext} from "../shared/AppWrapper";
 const md5 = require('md5');
 
 
 const {useState} = require("react");
 
-
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit">
-                ForexTrading
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -56,32 +44,29 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function SignIn() {
-    const [once, setOnce] = React.useState(true);
-
-    useEffect(() => { //Erases the localStorage
-        if(once){
-            localStorage.clear();
-            context.loggout();
-            setOnce(false);
-        }
-
-    });
+    let context = useAppContext();
     const classes = useStyles();
-
     let router = useRouter();
 
-    let passwordLabel = router.locale === 'en-US' ? 'Password' : 'Senha';
-    let repeatPasswordLabel = router.locale === 'en-US' ? 'Repeat Password' : 'Repetir a Senha';
-    let signinLabel = router.locale === 'en-US' ? 'Already have an account? Sign Ip' : 'Já tem uma conta? Entrar agora!';
     let nameLabel = router.locale === 'en-US' ? 'Name' : 'Nome';
-    let signup = router.locale === 'en-US' ? 'Sign Up' : 'Cadastrar';
+    let profileLabel = router.locale === 'en-US' ? 'Profile' : 'Perfil';
+    let saveLabel = router.locale === 'en-US' ? 'Save' : 'Salvar';
 
 
     let [email, setEmail] = useState('');
     let [name, setName] = useState('');
-    let [password, setPassword] = useState('');
-    let [repeatPassword, setRepeatPassword] = useState('');
     let [birthdate, setBirthdate] = useState('');
+
+    useEffect(() => { //Stores the user in the localstorage
+        if (email === '' && name ==='' && context.client){
+            setEmail(context.client.email);
+            setName(context.client.name);
+            setBirthdate(context.client.birthdate);
+        }
+        if(!context.isLogged && !localStorage.getItem('isLogged')){
+            router.push(router.locale+'/')
+        }
+    });
 
     function validateEmail(givenEmail) {
         const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -90,37 +75,42 @@ export default function SignIn() {
 
     function handleSignUp(event){
         event.preventDefault();
-        if(password !== repeatPassword) {
-            alert('Passwords do not Match!')
-        }
-        else if(password.length < 6){
-            alert('Passwords need to be minimum 6 charactheres long')
-        }
-        else if(!validateEmail(email)) {
+        if(!validateEmail(email)) {
             alert('Invalid Email!')
         } else {
-            let user = {name: name, email: email, password: md5(password), birthdate: birthdate};
-            axios.post(DATABASE_URL + CLIENTS+ '/signup', user).then( res => {
-                if(res.data === 'Email taken'){
-                    alert('Email Taken!')
-                } else {
-                    router.push(router.locale+'/');
-
-                }
+            let user = {name, email,  birthdate, bank_number: context.client.bank_number, account_number: context.client.account_number};
+            axios.put(DATABASE_URL + CLIENTS, user).then( res => {
+                sucessful();
             })
         }
     }
 
+    let [showAlert, setAlert] = React.useState('');
+    let successTransactionLabel = router.locale === 'en-US' ? '✓ Profile saved' : '✓ Perfil salvo!';
+
+    function sucessful(){
+        setAlert('success');
+        setTimeout(function(){ setAlert(''); }, 3000);
+    }
 
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
             <div className={classes.paper}>
+                <div className="d-flex justify-content-center align-items-center">
+                    {
+                        showAlert === 'success'?
+                            <div className="alert alert-success" role="alert">
+                                {successTransactionLabel}
+                            </div>
+                            : ''
+                    }
+                </div>
                 <Avatar className={classes.avatar}>
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {signup}
+                    {profileLabel}
                 </Typography>
                 <form className={classes.form} onSubmit={handleSignUp}>
                     <TextField
@@ -128,60 +118,43 @@ export default function SignIn() {
                         margin="normal"
                         required
                         fullWidth
+                        value={name}
                         onChange={(event) => setName(event.target.value)}
                         id="name"
                         label={nameLabel}
                         name="name"
                         autoComplete="name"
                         autoFocus
+                        required
                     />
                     <TextField
                         variant="outlined"
                         margin="normal"
                         required
                         fullWidth
+                        value={email}
                         onChange={(event) => setEmail(event.target.value)}
                         id="email"
                         label="Email"
                         name="email"
                         autoComplete="email"
                         autoFocus
-                    />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
                         required
-                        fullWidth
-                        name="password"
-                        onChange={(event) => setPassword(event.target.value)}
-                        label={passwordLabel}
-                        type="password"
-                        id="password"
-                        autoComplete="current-password"
                     />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        onChange={(event) => setRepeatPassword(event.target.value)}
-                        label={repeatPasswordLabel}
-                        type="password"
-                        id="repeatPassword"
-                        autoComplete="current-password"
-                    />
+
                     <TextField
                         variant="outlined"
                         margin="normal"
                         required
                         fullWidth
                         id="birthdate"
+                        value={birthdate}
                         label={birthdate}
                         name="birthdate"
                         autoComplete="birthdate"
                         onChange={(event) => setBirthdate(event.target.value)}
                         type="date"
+                        required
                     />
                     <Button
                         type="submit"
@@ -190,7 +163,7 @@ export default function SignIn() {
                         color="primary"
                         className={classes.submit}
                     >
-                        {signup}
+                        {saveLabel}
                     </Button>
                     <Grid container>
                         {/*<Grid item xs>*/}
@@ -198,17 +171,9 @@ export default function SignIn() {
                         {/*        Forgot password?*/}
                         {/*    </Link>*/}
                         {/*</Grid>*/}
-                        <Grid item>
-                            <Link href={router.locale+'/'} variant="body2">
-                                {signinLabel}
-                            </Link>
-                        </Grid>
                     </Grid>
                 </form>
             </div>
-            <Box mt={8}>
-                <Copyright />
-            </Box>
         </Container>
     );
 }

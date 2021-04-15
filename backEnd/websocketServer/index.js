@@ -13,7 +13,7 @@ const wss = new WebSocket.Server({ port: 8001 });
 console.log("Server open in port 8001");
 let infoBundle = {}
     = { usdTOgbp: 0.728646, usdTOeur: 0.840607, usdTObrl: 5.733826 }
-    ;
+;
 
 //Handles the connection to the websocket, calls the schedueler caller of the API
 wss.on('connection', function connection(ws) {
@@ -24,17 +24,17 @@ wss.on('connection', function connection(ws) {
     //     .then(response => {
     //         rate = response.data.quotes.USDGBP;
     //         console.log(rate);
-            if(ws){
-                // getCurrencyRateList('EUR').then(r => ws.send(r))
-                // teste;
-                // getLastest();
-                ws.send(JSON.stringify(infoBundle));
-                console.log(infoBundle)
-            }
-        // })
-        // .catch(err => {
-        //     console.log("oppps", err);
-        // });
+    if(ws){
+        // getCurrencyRateList('EUR').then(r => ws.send(r))
+        // teste;
+        // getLastest();
+        ws.send(JSON.stringify(infoBundle));
+        console.log(infoBundle)
+    }
+    // })
+    // .catch(err => {
+    //     console.log("oppps", err);
+    // });
 
     schedueler(ws);
 });
@@ -52,13 +52,13 @@ const getLastest = ()=> oxr.latest(function(error) {
 //Set the interval to maintain the value as realtime as possible
 let schedueler = function(ws) {
     setInterval(function(){
-    //     getQuoteRightNow()
-    //         .then(response => {
-    //             rate = response.data.quotes.USDGBP;
-    //             console.log(rate);
-                if(ws){
-                    ws.send(JSON.stringify(infoBundle));
-                }
+        //     getQuoteRightNow()
+        //         .then(response => {
+        //             rate = response.data.quotes.USDGBP;
+        //             console.log(rate);
+        if(ws){
+            ws.send(JSON.stringify(infoBundle));
+        }
         // })
         // .catch(err => {
         //     console.log("oppps", err);

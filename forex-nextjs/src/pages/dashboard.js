@@ -70,9 +70,10 @@ export default function Dashboard() {
 
     useEffect(() => { //Stores the user in the localstorage
         handlesWebsocket();
-
+        if(!context.isLogged && !localStorage.getItem('isLogged')){
+            router.push(router.locale+'/')
+        }
     });
-
 
 
     function updatesWallet(givenTransaction){ // Updates the wallet values for each currency
@@ -106,10 +107,7 @@ export default function Dashboard() {
             context.wallet.euroamount -= givenTransaction.to_amount;
         }
 
-        console.log(context.wallet);
-
         axios.put(DATABASE_URL + WALLETS, context.wallet).then( res => {
-            console.log(res.data);
             context.updateContext(context);
         })
     }
@@ -135,7 +133,6 @@ export default function Dashboard() {
             client_id: context.client.id,
             date: new Date()
         };
-        console.log(context.wallet);
 
         if(sellingCurrency === 'USD' && sellingAmount > context.wallet.dollaramount){// Rejects the transaction if the user cant afford
             rejectTransaction()
@@ -154,7 +151,6 @@ export default function Dashboard() {
         }
 
     }
-
 
 
     function handleCurrencyInput(operation, value){ //Calculates the amount of each currency the user has after the input
@@ -340,10 +336,11 @@ export default function Dashboard() {
         </div>
     );
 
-    if(context.client){
+    if(context.isLogged){
         return (
             <div className="mb-5">
                 {/*Title*/}
+
                 <div className="m-2 row">
                     <h1>{dashboardLabel}</h1>
                 </div>
