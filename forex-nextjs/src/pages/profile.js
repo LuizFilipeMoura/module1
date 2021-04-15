@@ -61,6 +61,7 @@ export default function SignIn() {
         if (email === '' && name ==='' && context.client){
             setEmail(context.client.email);
             setName(context.client.name);
+            console.log(context.client);
             setBirthdate(context.client.birthdate);
         }
         if(!context.isLogged && !localStorage.getItem('isLogged')){
@@ -78,7 +79,15 @@ export default function SignIn() {
         if(!validateEmail(email)) {
             alert('Invalid Email!')
         } else {
-            let user = {name, email,  birthdate, bank_number: context.client.bank_number, account_number: context.client.account_number};
+            let user = {id: context.client.id,
+                name,
+                email,
+                birthdate,
+                bank_number: context.client.bank_number,
+                account_number: context.client.account_number};
+            context.client = user;
+            context.updateContext(context);
+            localStorage.setItem('client', JSON.stringify(user));
             axios.put(DATABASE_URL + CLIENTS, user).then( res => {
                 sucessful();
             })
