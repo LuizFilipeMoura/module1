@@ -24,12 +24,12 @@ async function put(req, res, next){
         req.body.currency &&
         req.body.id){
         const client =  (await connect);
-        const sql = 'INSERT INTO withdraws ( client_id, currency, amount) VALUES ($1,$2,$3);';
+        const sql = 'INSERT INTO withdraws ( client_id, currency, amount, status, date) VALUES ($1,$2,$3, $4, $5);';
         console.log(req.body);
         const values = [
             req.body.id,
             req.body.currency,
-            req.body.amount];//Query Values
+            req.body.amount, 'DONE', new Date];//Query Values
 
         await client.query(sql, values); //Executes the query
         console.log('success');

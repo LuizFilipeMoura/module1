@@ -12,7 +12,7 @@ router.post('/', (req, res, next) => {
     q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
             const result = wallet_controller.post(req, res, next);
-            if(result === -1){
+            if(result === undefined){
                 reject(result)
             }
             resolve(result)
@@ -25,7 +25,7 @@ router.put('/', (req, res, next) => {
     q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
             const result = wallet_controller.put(req, res, next);
-            if(result === -1){
+            if(result === undefined){
                 reject(result)
             }
             resolve(result)

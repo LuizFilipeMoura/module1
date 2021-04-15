@@ -2,7 +2,6 @@ const connect = require('../../dbConnect/db').connect();
 
 //Gets all the past trades for that client
 async function post(req, res, next) {
-    console.log(req.body)
     if(req.body && req.body.id){
         const client = (await connect);
         const sql = 'SELECT * FROM pasttrades where client_id = $1';
@@ -47,5 +46,21 @@ async function put(req, res, next){
     }
 
 }
+//Deletes one pastTrade based on its id
+async function deletePastTrade(req, res, next) {
+    console.log(req.body);
+    if(req.body && req.body.id){
+        const client = (await connect);
+        const sql = 'DELETE FROM pasttrades where id = $1';
+        const values = [ req.body.id];//Query Values
 
-module.exports = { put, post };
+        let clientQuery = await client.query(sql, values); //Executes the query
+        res.send(clientQuery);
+    } else{
+        res.status(400);
+        console.log('error! Request Body is not complete');
+        res.send('error! Request Body is not complete');
+    }
+}
+
+module.exports = { put, post, deletePastTrade };

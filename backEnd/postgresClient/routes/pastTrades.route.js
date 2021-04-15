@@ -9,12 +9,11 @@ const pastTrades_controller = require('../controllers/pastTradesController');
 // PUT stores the new trade and
 // POST list all of them
 router.post('/', (req, res, next) => {
-    console.log('post');
 
     q.push(function () { //Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
             const result = pastTrades_controller.post(req, res, next);
-            if(result === -1){
+            if(result === undefined){
                 reject(result)
             }
             resolve(result)
@@ -25,8 +24,21 @@ router.post('/', (req, res, next) => {
 router.put('/', (req, res, next) => {
     q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
-            const result = pastTrades_controller.put(req, res, next)
-            if(result === -1){
+            const result = pastTrades_controller.put(req, res, next);
+            if(result === undefined){
+                reject(result)
+            }
+
+            resolve(result)
+        })
+    });
+});
+//Erase one pasttrade from the DB
+router.delete('/', (req, res, next) => {
+    q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
+        return new Promise(function (resolve, reject) {
+            const result = pastTrades_controller.deletePastTrade(req, res, next);
+            if(result === undefined){
                 reject(result)
             }
             resolve(result)

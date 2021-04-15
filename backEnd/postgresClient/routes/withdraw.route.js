@@ -13,8 +13,8 @@ router.post('/', (req, res, next) => {
 
     q.push(function () { //Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
-            const result = deposit_controller.post(req, res, next);
-            if(result === -1){
+            const result = withdraw_controller.post(req, res, next);
+            if(result === undefined){
                 reject(result)
             }
             resolve(result)
@@ -25,8 +25,8 @@ router.post('/', (req, res, next) => {
 router.put('/', (req, res, next) => {
     q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
-            const result = deposit_controller.put(req, res, next)
-            if(result === -1){
+            const result = withdraw_controller.put(req, res, next)
+            if(result === undefined){
                 reject(result)
             }
             resolve(result)

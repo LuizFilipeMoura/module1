@@ -70,18 +70,10 @@ export default function Dashboard() {
 
     useEffect(() => { //Stores the user in the localstorage
         handlesWebsocket();
-        if (!context.wallet || Object.entries(context.wallet).length === 0){
-            retrievesWallet();
-        }
+
     });
 
-    function retrievesWallet() {//Gets the values of the wallet for that client
-        axios.post(DATABASE_URL + WALLETS, context.client).then( res => {
-            context.wallet = res.data.rows[0];
-            localStorage.setItem('wallet', JSON.stringify(res.data.rows[0]));
-            context.updateContext(context);
-        })
-    }
+
 
     function updatesWallet(givenTransaction){ // Updates the wallet values for each currency
 
@@ -114,8 +106,11 @@ export default function Dashboard() {
             context.wallet.euroamount -= givenTransaction.to_amount;
         }
 
+        console.log(context.wallet);
+
         axios.put(DATABASE_URL + WALLETS, context.wallet).then( res => {
-            retrievesWallet();
+            console.log(res.data);
+            context.updateContext(context);
         })
     }
 
@@ -140,6 +135,7 @@ export default function Dashboard() {
             client_id: context.client.id,
             date: new Date()
         };
+        console.log(context.wallet);
 
         if(sellingCurrency === 'USD' && sellingAmount > context.wallet.dollaramount){// Rejects the transaction if the user cant afford
             rejectTransaction()
@@ -150,11 +146,13 @@ export default function Dashboard() {
         }else if(sellingCurrency === 'GBP' && sellingAmount > context.wallet.poundamount){
             rejectTransaction()
         } else{
-            sucessfulTransaction()
+            sucessfulTransaction();
             axios.put(DATABASE_URL + PASTTRADES, transaction).then( res => {
-                updatesWallet(transaction);
+                context.updateContext(context);
             });
+            updatesWallet(transaction)
         }
+
     }
 
 
@@ -372,6 +370,9 @@ export default function Dashboard() {
                             </CardActionArea>
                             <CardActions>
                                 <Button size="small" color="secondary" onClick={()=> {
+                                    setBuyingAmount(0);
+                                    setSellingAmount(0);
+
                                     if(sellingCurrency !== currency[0]){
                                         setBuyingCurrency(currency[0])
                                     }
@@ -386,6 +387,8 @@ export default function Dashboard() {
                                     {buyButtonLabel}
                                 </Button>
                                 <Button size="small" color="secondary" onClick={()=> {
+                                    setBuyingAmount(0);
+                                    setSellingAmount(0);
                                     if(buyingCurrency !== currency[0]){
                                         setSellingCurrency(currency[0])
                                     }

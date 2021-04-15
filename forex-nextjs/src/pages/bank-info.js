@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -64,6 +64,14 @@ export default function BankInfo() {
         })
     }
 
+    useEffect(() => { //Stores the user in the localstorage
+        if (bankNumber === '' && accountNumber ===''){
+            console.log(context.client);
+            setBankNumber(context.client.bank_number);
+            setAccountNumber(context.client.account_number);
+        }
+    });
+
     function sucessful(){
         setAlert('success');
         setTimeout(function(){ setAlert(''); }, 3000);
@@ -96,6 +104,7 @@ export default function BankInfo() {
                         type="number"
                         variant="outlined"
                         margin="normal"
+                        value={bankNumber}
                         min="0"
                         required
                         fullWidth
@@ -108,6 +117,7 @@ export default function BankInfo() {
                         type="number"
                         variant="outlined"
                         margin="normal"
+                        value={accountNumber}
                         min="0"
                         required
                         fullWidth

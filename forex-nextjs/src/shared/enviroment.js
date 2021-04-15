@@ -4,6 +4,8 @@ export const CLIENTS = '/clients';
 export const WALLETS = '/wallets';
 export const PASTTRADES = '/pasttrades';
 export const DEPOSITS = '/deposits';
+export const WITHDRAWS = '/withdraws';
+
 
 
 

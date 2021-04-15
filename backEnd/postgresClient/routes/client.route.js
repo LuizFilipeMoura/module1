@@ -13,7 +13,7 @@ router.post('/signin', (req, res, next) => {
     q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
             const result = client_controller.signIn(req, res, next);
-            if(result === -1){
+            if(result === undefined){
                 reject(result)
             }
             resolve(result)
@@ -26,7 +26,7 @@ router.post('/signup', (req, res, next) => {
     q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
             const result = client_controller.signUp(req, res, next);
-            if(result === -1){
+            if(result === undefined){
                 reject(result)
             }
             resolve(result)
@@ -39,7 +39,7 @@ router.put('/', (req, res, next) => {
     q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
             const result = client_controller.put(req, res, next);
-            if(result === -1){
+            if(result === undefined){
                 reject(result)
             }
             resolve(result)

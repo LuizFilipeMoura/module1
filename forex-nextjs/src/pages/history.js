@@ -1,19 +1,45 @@
 import React, {useEffect, useState} from "react";
 import {DATABASE_URL, PASTTRADES} from "../shared/enviroment";
 import {useAppContext} from "../shared/AppWrapper";
+import DeleteIcon from '@material-ui/icons/Delete';
 
 import axios from "axios";
 import {useRouter} from "next/router";
+import Button from "@material-ui/core/Button";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import Modal from "@material-ui/core/Modal";
+import Backdrop from "@material-ui/core/Backdrop";
+import Fade from "@material-ui/core/Fade";
+
+const useStyles = makeStyles((theme) => ({
+    modal: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    paper: {
+        backgroundColor: theme.palette.background.dark,
+        border: '2px solid #000',
+        boxShadow: theme.shadows[5],
+        padding: theme.spacing(2, 4, 3),
+    },
+}));
 
 export default function History (){
     let context = useAppContext();
     let [trades, setTrades] = useState();
+    let [btnValue, setBtnValue] = useState();
 
     let router = useRouter();
 
     let dataLabel = router.locale === 'en-US' ? 'Date' : 'Data';
     let buyingLabel = router.locale === 'en-US' ? 'Buying' : 'Comprando';
     let sellingLabel = router.locale === 'en-US' ? 'Selling' : 'Vendendo';
+    let deletingLabel = router.locale === 'en-US' ? 'You are sure you want to delete this transaction from your history?'
+        : 'Voce tem certeza que quer deletar essa transação do seu histórico?';
+    let yesLabel = router.locale === 'en-US' ? 'Yes' : 'Sim';
+    let cancelLabel = router.locale === 'en-US' ? 'Cancel' : 'Cancelar';
+
 
 
     useEffect(() => { //Stores the user in the localstorage
@@ -32,8 +58,56 @@ export default function History (){
                 console.log("oppps", err);
             });
     }
+
+    function makesDelete(){
+        console.log('deletou '+ btnValue);
+        axios.delete(DATABASE_URL + PASTTRADES, {data: {id: btnValue}})
+            .then(response => {
+                handleClose();
+                listTrades();
+            })
+            .catch(err => {
+                console.log("oppps", err);
+            });
+    }
+
+    const classes = useStyles();
+    const [open, setOpen] = React.useState(false);
+
+    const handleOpen = (event) => {
+        setBtnValue(event.currentTarget.value);
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     return(
         <div className="d-flex justify-content-md-center align-items-center">
+            <div>
+                <Modal
+                    aria-labelledby="transition-modal-title"
+                    aria-describedby="transition-modal-description"
+                    className={classes.modal}
+                    open={open}
+                    onClose={handleClose}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                        timeout: 500,
+                    }}
+                >
+                    <Fade in={open}>
+                        <div className={classes.paper}>
+                            <h2 id="transition-modal-title">{deletingLabel}</h2>
+                            <Button onClick={makesDelete}>{yesLabel}</Button>
+                            <Button onClick={handleClose}>{cancelLabel}</Button>
+                        </div>
+                    </Fade>
+                </Modal>
+            </div>
+
             <div >
                 <table className="table table-light">
                     <thead>
@@ -66,8 +140,7 @@ export default function History (){
                                 <span style={{fontSize: '18px'}}>{trade.to_amount.toFixed(2)}</span>
 
                             </td>
-                            <td>{trade.amount}</td>
-                            <td>{trade.operation}</td>
+                            <td><Button variant="contained" onClick={handleOpen} value={trade.id}><DeleteIcon id={trade.id}/></Button></td>
                         </tr>
                     )}
                     </tbody>

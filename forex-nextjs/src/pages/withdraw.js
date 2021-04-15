@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {useRouter} from "next/router";
-import { DATABASE_URL, DEPOSITS} from "../shared/enviroment";
+import {DATABASE_URL, DEPOSITS, PASTTRADES, WITHDRAWS} from "../shared/enviroment";
 import {useAppContext} from "../shared/AppWrapper";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Deposit() {
+export default function Withdraw() {
     let context = useAppContext();
 
     const classes = useStyles();
@@ -50,63 +50,88 @@ export default function Deposit() {
 
     let currencyLabel = router.locale === 'en-US' ? 'Currency' : 'Moeda';
     let amountLabel = router.locale === 'en-US' ? 'Amount' : 'Montante';
-    let saveLabel = router.locale === 'en-US' ? 'Request Deposit' : 'Requerir Depósito';
+    let saveLabel = router.locale === 'en-US' ? 'Request Withdraw' : 'Requerir Saque';
     let forexAccountLabel = router.locale === 'en-US' ? 'Account:' : 'Conta:';
-    let depositInstructionsLabel = router.locale === 'en-US' ? 'The deposit must be done in these following account:'
-        : 'O depóstio deverá ser feito na seguinte conta:';
-    let depositLabel = router.locale === 'en-US' ? 'Deposit' : 'Depósito';
+    let withdrawInstructionsLabel = router.locale === 'en-US' ? 'The withdraw will be done in these following account:'
+        : 'O saque será feito na seguinte conta:';
+    let withdrawLabel = router.locale === 'en-US' ? 'Withdraw' : 'Saque';
     let dateLabel = router.locale === 'en-US' ? 'Date' : 'Data';
 
 
 
     let [currency, setCurrency] = useState('');
     let [amount, setAmount] = useState(0);
-    let [deposits, setDeposits] = useState();
+    let [withdraws, setWithdraws] = useState();
 
 
     useEffect(() => { //Stores the user in the localstorage
-        if(!deposits){
-            listDeposits();
+        if(!withdraws){
+            listWithdraws();
         }
     });
 
-    function listDeposits(){//Lists the deposits on the dataBase for that client
+    function listWithdraws(){//Lists the withdraws on the dataBase for that client
 
-        axios.post(DATABASE_URL + DEPOSITS, context.client)
+        axios.post(DATABASE_URL + WITHDRAWS, context.client)
             .then(response => {
-                setDeposits(response.data.rows.length === 0 ? [] : response.data.rows);
+                setWithdraws(response.data.rows.length === 0 ? [] : response.data.rows);
             })
             .catch(err => {
                 console.log("oppps", err);
             });
     }
 
-    function handleDeposit(event){
-        event.preventDefault();
-        let request = {id: context.client.id, currency, amount};
-        axios.put(DATABASE_URL + DEPOSITS, request).then( res => {
-            sucessful();
-            listDeposits();
-        })
+    function rejectTransaction(){
+        setAlert('fail');
+        setTimeout(function(){ setAlert(''); }, 3000);
     }
-
-    function sucessful(){
+    function sucessfulTransaction(){
         setAlert('success');
         setTimeout(function(){ setAlert(''); }, 3000);
     }
 
+    function handleWithdraw(event){
+        event.preventDefault();
+        
+        let request = {id: context.client.id, currency, amount};
+        
+        if(currency === 'USD' && amount > context.wallet.dollaramount){// Rejects the transaction if the user cant afford
+            rejectTransaction()
+        } else if(currency === 'BRL' && amount > context.wallet.realamount){
+            rejectTransaction()
+        }else if(currency === 'EUR' && amount > context.wallet.euroamount){
+            rejectTransaction()
+        }else if(currency === 'GBP' && amount > context.wallet.poundamount){
+            rejectTransaction()
+        } else{
+            console.log(request);
+            axios.put(DATABASE_URL + WITHDRAWS, request).then( res => {
+                sucessfulTransaction();
+                listWithdraws();
+                context.updateContext(context);
+            })
+        }
+    }
+
     let [showAlert, setAlert] = React.useState('');
+
     let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
     let nameLabel = router.locale === 'en-US' ? 'Name: ' : 'Nome: ';
+    let failTransactionLabel = router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ';
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
             <div className={classes.paper}>
-                <div className="d-flex justify-content-center align-items-center">
+                {/*    Alerts for the operation */}
+                <div className="m-2 d-flex justify-content-center align-items-center ">
                     {
                         showAlert === 'success'?
                             <div className="alert alert-success" role="alert">
                                 {successTransactionLabel}
+                            </div>
+                            : showAlert === 'fail' ?
+                            <div className="alert alert-danger" role="alert">
+                                {failTransactionLabel}
                             </div>
                             : ''
                     }
@@ -115,11 +140,11 @@ export default function Deposit() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {depositLabel}
+                    {withdrawLabel}
                 </Typography>
 
 
-                <form className={classes.form} onSubmit={handleDeposit}>
+                <form className={classes.form} onSubmit={handleWithdraw}>
                     <InputLabel id="demo-simple-select-label">{currencyLabel}</InputLabel>
                     <Select
                         value={currency}
@@ -146,7 +171,7 @@ export default function Deposit() {
                         label={amountLabel}
                     />
                     <span>
-                        <p>{depositInstructionsLabel}</p>
+                        <p>{withdrawInstructionsLabel}</p>
                         <p>FOREX: 0001</p>
                         {
                             context.client?
@@ -174,21 +199,21 @@ export default function Deposit() {
 
             </div>
             <div className=" mt-5 mb-5 w-100" >
-                {deposits?.map(deposit =>
+                {withdraws?.map(withdraw =>
 
                     <div className="d-flex justify-content-center align-items-center" >
-                        {deposit.status === 'DONE'?
+                        {withdraw.status === 'DONE'?
                             <div className="alert alert-success w-100" role="alert">
-                                <p>{depositLabel}</p> {deposit.amount} {deposit.currency}  {deposit.status}
+                                <p>{withdrawLabel}</p> {withdraw.amount} {withdraw.currency}  {withdraw.status}
                             </div>
                             :
                             <div className="alert alert-danger w-100" role="alert">
-                                <p>{depositLabel} {deposit.status}</p> <strong>
-                                <p>{amountLabel}: {deposit.amount}</p>
-                                <p>{currencyLabel}: {deposit.currency}</p>
+                                <p>{withdrawLabel} {withdraw.status}</p> <strong>
+                                <p>{amountLabel}: {withdraw.amount}</p>
+                                <p>{currencyLabel}: {withdraw.currency}</p>
                             </strong>
-                                <p>{dateLabel}: {(new Date(deposit.date)).toLocaleDateString() + ' '+ (new Date(deposit.date)).getHours() + ':' +
-                                ((new Date(deposit.date)).getUTCMinutes() <= 9? '0' + (new Date(deposit.date)).getUTCMinutes(): (new Date(deposit.date)).getUTCMinutes() ) }</p>
+                                <p>{dateLabel}: {(new Date(withdraw.date)).toLocaleDateString() + ' '+ (new Date(withdraw.date)).getHours() + ':' +
+                                ((new Date(withdraw.date)).getUTCMinutes() <= 9? '0' + (new Date(withdraw.date)).getUTCMinutes(): (new Date(withdraw.date)).getUTCMinutes() ) }</p>
                             </div>
                         }
 

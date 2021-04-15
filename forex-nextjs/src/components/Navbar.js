@@ -5,6 +5,8 @@ import React, {useEffect, useState} from "react";
 import {useAppContext} from "../shared/AppWrapper";
 
 import {makeStyles} from "@material-ui/core/styles";
+import axios from "axios";
+import {DATABASE_URL, WALLETS} from "../shared/enviroment";
 
 const useStyles = makeStyles({//Define the style of the page
     list: {
@@ -14,19 +16,22 @@ const useStyles = makeStyles({//Define the style of the page
         background: "#a91c1c"
     }
 });
+
 const Navbar = ({currencies, wallet, client}) => {
     let context = useAppContext();
     const classes = useStyles();
     const [state, setState] = React.useState({
         left: false,
     });
+    const [once, setOnce] = React.useState(true);
 
-    useEffect(() => { //Stores the user in the localstorage
-        if (wallet && Object.entries(context.wallet).length === 0) {
-            context.client = (JSON.parse(localStorage.getItem('client')));
-            context.wallet = (JSON.parse(localStorage.getItem('wallet')));
-            context.updateContext(context);
-        }
+
+        useEffect(() => { //Stores the user in the localstorage
+            if(once){
+                context.updateContext(context);
+                setOnce(false);
+            }
+
     });
 
     const toggleDrawer = (anchor, open) => (event) => {//Toggles Side Drawer
@@ -38,7 +43,6 @@ const Navbar = ({currencies, wallet, client}) => {
 
     if(wallet && Object.entries(wallet).length !== 0) //Shows the navbar just when there are values inside the wallet
         return(
-
             <div className="m-2 row ">
                 {}
                 <React.Fragment >
