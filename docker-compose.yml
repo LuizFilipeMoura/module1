@@ -1,0 +1,68 @@
+version: "3"
+
+services:
+  nextjs:
+    image: nextjs
+    container_name: nextjs2
+    restart: always
+    networks:
+      - my-network
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - "3001:3001"
+    depends_on:
+      - node
+      - wsocket
+
+  pgtest:
+    build:
+      context: .
+      dockerfile: ./backEnd/pgsql.dockerfile
+    container_name: pgtest
+    networks:
+      - my-network
+    ports:
+      - 5432:5432/tcp
+
+  node:
+    image: node
+    container_name: node
+    networks:
+      - my-network
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./:/app
+    depends_on:
+      - pgtest
+
+  wsocket:
+    image: ws
+    container_name: wsocket
+    networks:
+      - my-network
+    volumes:
+      - ./:/app
+    ports:
+      - "8001:8001"
+    depends_on:
+      - pgtest
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-user@yourdomain.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-SuperSecret}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+
+    ports:
+      - "80:80"
+    networks:
+      - my-network
+    restart: unless-stopped
+
+networks:
+  my-network:
+    driver: bridge

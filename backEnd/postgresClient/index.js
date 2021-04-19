@@ -33,7 +33,9 @@ app.use('/deposits', deposits);
 
 //Opens server
 let port = 8000;
-app.listen(port, () => {
+let host = '0.0.0.0';
+
+app.listen(port, host, () => {
     console.log('Server open in port: ' + port);
 });
 

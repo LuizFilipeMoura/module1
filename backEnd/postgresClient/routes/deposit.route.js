@@ -9,8 +9,6 @@ const deposit_controller = require('../controllers/depositController');
 // PUT stores the new trade and
 // POST list all of them
 router.post('/', (req, res, next) => {
-    console.log('post');
-
     q.push(function () { //Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
             const result = deposit_controller.post(req, res, next);

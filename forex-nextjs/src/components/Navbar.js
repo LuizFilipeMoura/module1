@@ -1,12 +1,10 @@
 import Button from "@material-ui/core/Button";
 import Drawer from "@material-ui/core/Drawer";
 import DrawerList from "./Drawer";
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {useAppContext} from "../shared/AppWrapper";
 
-import {makeStyles} from "@material-ui/core/styles";
-import axios from "axios";
-import {DATABASE_URL, WALLETS} from "../shared/enviroment";
+import {makeStyles} from "@material-ui/core/styles";;
 import {useRouter} from "next/router";
 
 const useStyles = makeStyles({//Define the style of the page

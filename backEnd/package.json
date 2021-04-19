@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start database": "node postgresClient/index.js",
-    "start websocket": "node websocketServer/index.js"
+    "start_database": "node postgresClient/index.js",
+    "start_websocket": "node websocketServer/index.js"
   },
   "author": "",
   "license": "ISC",

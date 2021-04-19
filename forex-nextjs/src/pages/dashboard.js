@@ -9,15 +9,14 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import Card from "@material-ui/core/Card";
 import CurrencyTextField from '@unicef/material-ui-currency-textfield'
-import {WEBSOCKET} from "../../../forex/src/shared/enviroment";
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 import axios from "axios";
-import {DATABASE_URL, PASTTRADES, WALLETS} from "../shared/enviroment";
+import {DATABASE_URL, PASTTRADES, WALLETS, WEBSOCKET_URL} from "../shared/enviroment";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import { useAppContext} from "../shared/AppWrapper";
 
-const wsClient = new W3CWebSocket(WEBSOCKET); //WebSocket Connection
+const wsClient = new W3CWebSocket(WEBSOCKET_URL); //WebSocket Connection
 
 const useStyles = makeStyles({//Define the style of the page
     list: {
@@ -234,76 +233,76 @@ export default function Dashboard() {
             {[currencies[0], currencies[1]].map((currency, index) => (
                 <>
                     <div className="m-2 d-flex justify-content-center align-items-center " key={index}>
-                    <div >
-                        <h3>{operationLabel[index]}</h3>
-                    </div>
+                        <div >
+                            <h3>{operationLabel[index]}</h3>
+                        </div>
 
-                    <div className="m-2">
-                        <CurrencyTextField
-                            value={index === 0? buyingAmount: sellingAmount}
-                            variant="filled"
-                            currencySymbol={currency[1]}
-                            id={index === 0? 'buyingAmountInput': 'sellingAmountInput'}
-                            name="input-name"
-                            placeholder="Please enter a number"
-                            defaultValue={0.00}
-                            decimalsLimit={2}
-                            decimalCharacter="."
-                            digitGroupSeparator=""
-                            onChange={(textValue, name) => {
-                                let value = Number(textValue.target.value);
-                                handleCurrencyInput(index, value);
-
-                            }}
-                        />
-
-                    </div>
-                    {
-                        index===0 ? //If it is a buying amount input
-
-                            <Select
-                                value={buyingCurrency}
+                        <div className="m-2">
+                            <CurrencyTextField
+                                value={index === 0? buyingAmount: sellingAmount}
                                 variant="filled"
-                                onChange={(event)=>{
-                                    if(event.target.value !== 'USD' && sellingCurrency !=='USD'){
-                                        setSellingCurrency('USD');
-                                    }
-                                    setBuyingCurrency(event.target.value);
-                                    setBuyingAmount(0);
-                                    setSellingAmount(0);
+                                currencySymbol={currency[1]}
+                                id={index === 0? 'buyingAmountInput': 'sellingAmountInput'}
+                                name="input-name"
+                                placeholder="Please enter a number"
+                                defaultValue={0.00}
+                                decimalsLimit={2}
+                                decimalCharacter="."
+                                digitGroupSeparator=""
+                                onChange={(textValue, name) => {
+                                    let value = Number(textValue.target.value);
+                                    handleCurrencyInput(index, value);
 
-                                }}>
-                                {currencies.map((currencyToSelect, index) =>
-                                    !(currencyToSelect[0] === sellingCurrency) ?
-                                        <MenuItem value={currencyToSelect[0]} style={{backgroundColor: '#6d2177'}} key={index}>
-                                            {currencyToSelect[2].toUpperCase()}
-                                        </MenuItem>
-                                        :''
-                                )}
+                                }}
+                            />
 
-                            </Select>
-                            ://If it is a selling amount input
-                            <Select
-                                value={sellingCurrency}
-                                variant="filled"
-                                onChange={(event)=>{
-                                    if(event.target.value !== 'USD' && buyingCurrency !=='USD'){
-                                        setBuyingCurrency('USD');
-                                    }
-                                    setSellingCurrency(event.target.value);
-                                    setBuyingAmount(0);
-                                    setSellingAmount(0);
+                        </div>
+                        {
+                            index===0 ? //If it is a buying amount input
 
-                                }}>
-                                {currencies.map((currencyToSelect, index) =>
-                                    !(currencyToSelect[0] === buyingCurrency) ?
-                                        <MenuItem value={currencyToSelect[0]} style={{backgroundColor: '#6d2177'}}>
-                                            {currencyToSelect[2].toUpperCase()}
-                                        </MenuItem>
-                                        :''
-                                )}
-                            </Select>
-                    }
+                                <Select
+                                    value={buyingCurrency}
+                                    variant="filled"
+                                    onChange={(event)=>{
+                                        if(event.target.value !== 'USD' && sellingCurrency !=='USD'){
+                                            setSellingCurrency('USD');
+                                        }
+                                        setBuyingCurrency(event.target.value);
+                                        setBuyingAmount(0);
+                                        setSellingAmount(0);
+
+                                    }}>
+                                    {currencies.map((currencyToSelect, index) =>
+                                        !(currencyToSelect[0] === sellingCurrency) ?
+                                            <MenuItem value={currencyToSelect[0]} style={{backgroundColor: '#6d2177'}} key={index}>
+                                                {currencyToSelect[2].toUpperCase()}
+                                            </MenuItem>
+                                            :''
+                                    )}
+
+                                </Select>
+                                ://If it is a selling amount input
+                                <Select
+                                    value={sellingCurrency}
+                                    variant="filled"
+                                    onChange={(event)=>{
+                                        if(event.target.value !== 'USD' && buyingCurrency !=='USD'){
+                                            setBuyingCurrency('USD');
+                                        }
+                                        setSellingCurrency(event.target.value);
+                                        setBuyingAmount(0);
+                                        setSellingAmount(0);
+
+                                    }}>
+                                    {currencies.map((currencyToSelect, index) =>
+                                        !(currencyToSelect[0] === buyingCurrency) ?
+                                            <MenuItem value={currencyToSelect[0]} style={{backgroundColor: '#6d2177'}}>
+                                                {currencyToSelect[2].toUpperCase()}
+                                            </MenuItem>
+                                            :''
+                                    )}
+                                </Select>
+                        }
 
                     </div>
                 </>
@@ -312,15 +311,15 @@ export default function Dashboard() {
 
 
 
-        {/*  The bottom text where the calculations happen to give the value of the transaction to the client   */}
-        <div className="m-2 d-flex justify-content-center align-items-center ">
+            {/*  The bottom text where the calculations happen to give the value of the transaction to the client   */}
+            <div className="m-2 d-flex justify-content-center align-items-center ">
 
-            <h5>{buyingAmount.toFixed(2)} {buyingCurrency} {equalsToLabel}</h5>
-        </div>
+                <h5>{buyingAmount.toFixed(2)} {buyingCurrency} {equalsToLabel}</h5>
+            </div>
 
-        <div className="m-2 d-flex justify-content-center align-items-center ">
-            <h2>{sellingAmount.toFixed(2)} {sellingCurrency} </h2>
-        </div>
+            <div className="m-2 d-flex justify-content-center align-items-center ">
+                <h2>{sellingAmount.toFixed(2)} {sellingCurrency} </h2>
+            </div>
             <div className="m-2 d-flex justify-content-center align-items-center ">
                 <Button
                     variant='contained'
@@ -366,42 +365,42 @@ export default function Dashboard() {
                                 </CardContent>
                             </CardActionArea>
                             <CardActions>
-                                <Button size="small" color="secondary" onClick={()=> {
-                                    setBuyingAmount(0);
-                                    setSellingAmount(0);
+                                {/*<Button size="small" color="secondary" onClick={()=> {*/}
+                                {/*    setBuyingAmount(0);*/}
+                                {/*    setSellingAmount(0);*/}
 
-                                    if(sellingCurrency !== currency[0]){
-                                        setBuyingCurrency(currency[0])
-                                    }
-                                    else {
-                                        setSellingCurrency(buyingCurrency);
-                                        setBuyingCurrency(currency[0]);
-                                    }
-                                    if(currency[0] !== 'USD' && sellingCurrency !== 'USD'){
-                                        setSellingCurrency('USD');
-                                    }
-                                }}>
-                                    {buyButtonLabel}
-                                </Button>
-                                <Button size="small" color="secondary" onClick={()=> {
-                                    setBuyingAmount(0);
-                                    setSellingAmount(0);
-                                    if(buyingCurrency !== currency[0]){
-                                        setSellingCurrency(currency[0])
-                                    }
-                                    else if ( currency[0] !== 'USD'){
-                                        setBuyingCurrency(buyingCurrency);
-                                        setSellingCurrency(currency[0]);
-                                    } else {
-                                        setBuyingCurrency(sellingCurrency);
-                                        setSellingCurrency('USD');
-                                    }
-                                    if(currency[0] !== 'USD' && buyingCurrency !== 'USD'){
-                                        setBuyingCurrency('USD');
-                                    }
-                                }}>
-                                    {sellButtonLabel}
-                                </Button>
+                                {/*    if(sellingCurrency !== currency[0]){*/}
+                                {/*        setBuyingCurrency(currency[0])*/}
+                                {/*    }*/}
+                                {/*    else {*/}
+                                {/*        setSellingCurrency(buyingCurrency);*/}
+                                {/*        setBuyingCurrency(currency[0]);*/}
+                                {/*    }*/}
+                                {/*    if(currency[0] !== 'USD' && sellingCurrency !== 'USD'){*/}
+                                {/*        setSellingCurrency('USD');*/}
+                                {/*    }*/}
+                                {/*}}>*/}
+                                {/*    {buyButtonLabel}*/}
+                                {/*</Button>*/}
+                                {/*<Button size="small" color="secondary" onClick={()=> {*/}
+                                {/*    setBuyingAmount(0);*/}
+                                {/*    setSellingAmount(0);*/}
+                                {/*    if(buyingCurrency !== currency[0]){*/}
+                                {/*        setSellingCurrency(currency[0])*/}
+                                {/*    }*/}
+                                {/*    else if ( currency[0] !== 'USD'){*/}
+                                {/*        setBuyingCurrency(buyingCurrency);*/}
+                                {/*        setSellingCurrency(currency[0]);*/}
+                                {/*    } else {*/}
+                                {/*        setBuyingCurrency(sellingCurrency);*/}
+                                {/*        setSellingCurrency('USD');*/}
+                                {/*    }*/}
+                                {/*    if(currency[0] !== 'USD' && buyingCurrency !== 'USD'){*/}
+                                {/*        setBuyingCurrency('USD');*/}
+                                {/*    }*/}
+                                {/*}}>*/}
+                                {/*    {sellButtonLabel}*/}
+                                {/*</Button>*/}
                             </CardActions>
                         </Card>
                     ))}

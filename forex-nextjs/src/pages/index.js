@@ -76,6 +76,7 @@ export default function SignIn() {
             context.loggout();
             setOnce(false);
         }
+        console.log('BBBBBBBBBBBBBBBBBBBB');
 
     });
 

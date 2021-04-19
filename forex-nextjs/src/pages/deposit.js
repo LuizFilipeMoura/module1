@@ -77,6 +77,7 @@ export default function Deposit() {
 
         axios.post(DATABASE_URL + DEPOSITS, context.client)
             .then(response => {
+                console.log(response.data.rows);
                 setDeposits(response.data.rows.length === 0 ? [] : response.data.rows);
             })
             .catch(err => {
@@ -182,7 +183,14 @@ export default function Deposit() {
                     <div className="d-flex justify-content-center align-items-center" >
                         {deposit.status === 'DONE'?
                             <div className="alert alert-success w-100" role="alert">
-                                <p>{depositLabel}</p> {deposit.amount} {deposit.currency}  {deposit.status}
+                                <p>{depositLabel} {deposit.status}</p> <strong>
+                                <p>{amountLabel}: {deposit.amount}</p>
+                                <p>{currencyLabel}: {deposit.currency}</p>
+                            </strong>
+                                <p>{dateLabel}: {(new Date(deposit.date)).toLocaleDateString() + ' '+ (new Date(deposit.date)).getHours() + ':' +
+                                ((new Date(deposit.date)).getUTCMinutes() <= 9? '0' + (new Date(deposit.date)).getUTCMinutes(): (new Date(deposit.date)).getUTCMinutes() ) }</p>
+                                {deposit.obs && deposit.obs !== '' ?
+                                    <p>{currencyLabel}: {deposit.obs}</p>: ''}
                             </div>
                             :
                             <div className="alert alert-danger w-100" role="alert">
@@ -192,6 +200,8 @@ export default function Deposit() {
                             </strong>
                                 <p>{dateLabel}: {(new Date(deposit.date)).toLocaleDateString() + ' '+ (new Date(deposit.date)).getHours() + ':' +
                                 ((new Date(deposit.date)).getUTCMinutes() <= 9? '0' + (new Date(deposit.date)).getUTCMinutes(): (new Date(deposit.date)).getUTCMinutes() ) }</p>
+                                {deposit.obs && deposit.obs !== '' ?
+                                    <p>{currencyLabel}: {deposit.obs}</p>: ''}
                             </div>
                         }
 

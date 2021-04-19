@@ -10,18 +10,26 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {useRouter} from "next/router";
-import {CLIENTS, DATABASE_URL, DEPOSITS, PASTTRADES, WITHDRAWS} from "../shared/enviroment";
+import {CLIENTS, DATABASE_URL, DEPOSITS, WITHDRAWS} from "../shared/enviroment";
 import {useAppContext} from "../shared/AppWrapper";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+import Modal from "@material-ui/core/Modal";
+import Backdrop from "@material-ui/core/Backdrop";
+import Fade from "@material-ui/core/Fade";
 
 
 const {useState} = require("react");
 
 
 const useStyles = makeStyles((theme) => ({
+    modal: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     paper: {
         marginTop: theme.spacing(8),
         display: 'flex',
@@ -60,9 +68,9 @@ export default function SendMoney() {
 
     let router = useRouter();
 
-    let sendMoneyLabel = router.locale === 'en-US' ? 'Save Money' : 'Enviar dinheiro';
+    let sendMoneyLabel = router.locale === 'en-US' ? 'Send Money' : 'Enviar dinheiro';
 
-    let sendLabel = router.locale === 'en-US' ? 'Send!' : 'Enviar';
+    let sendLabel = router.locale === 'en-US' ? 'Send!' : 'Enviar!';
     let currencyLabel = router.locale === 'en-US' ? 'Currency' : 'Moeda';
     let amountLabel = router.locale === 'en-US' ? 'Amount' : 'Montante';
     let clientReceiverLabel = router.locale === 'en-US' ? 'Receiver\'s name' : 'Nome do Recebedor';
@@ -70,7 +78,7 @@ export default function SendMoney() {
 
     let [clients, setClients] = useState('');
     let [clientReceiver, setClientReceiver] = useState();
-    let [currency, setCurrency] = useState('');
+    let [currency, setCurrency] = useState('USD');
     let [amount, setAmount] = useState(0);
 
     useEffect(() => { //Stores the user in the localstorage
@@ -105,17 +113,16 @@ export default function SendMoney() {
     }
 
     function handleDeposit(){
-        let request = {id: clientReceiver.id, currency, amount, status: 'DONE'};
+        let request = {id: clientReceiver.id, currency, amount, status: 'DONE', obs: ('SENT BY ' + context.name)};
         axios.put(DATABASE_URL + DEPOSITS, request).then( res => {
             sucessfulTransaction();
+            handleClose()
             context.updateContext(context);
         })
     }
 
     function handleWithdraw(event){
         event.preventDefault();
-
-        let request = {id: context.client.id, currency, amount, status: 'DONE'};
 
         if(currency === 'USD' && amount > context.wallet.dollaramount){// Rejects the transaction if the user cant afford
             rejectTransaction()
@@ -126,11 +133,7 @@ export default function SendMoney() {
         }else if(currency === 'GBP' && amount > context.wallet.poundamount){
             rejectTransaction()
         } else{
-            axios.put(DATABASE_URL + WITHDRAWS, request).then( res => {
-                sucessfulTransaction();
-                context.updateContext(context);
-                handleDeposit()
-            })
+            handleOpen()
         }
     }
 
@@ -138,10 +141,53 @@ export default function SendMoney() {
     let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
     let failTransactionLabel = router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ';
 
+    const [open, setOpen] = React.useState(false);
+
+    const handleOpen = (event) => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    function doTransaction() {
+        let request = {id: context.client.id, currency, amount, status: 'DONE', obs: ('SENT TO ' + clientReceiver.name)};
+        axios.put(DATABASE_URL + WITHDRAWS, request).then(res => {
+            sucessfulTransaction();
+            context.updateContext(context);
+            handleDeposit()
+        });
+    }
+    let cancelLabel = router.locale === 'en-US' ? 'Cancel' : 'Cancelar';
+
     return (
         <Container component="main" maxWidth="xs">
 
             <CssBaseline />
+            <div>
+                <Modal
+                    aria-labelledby="transition-modal-title"
+                    aria-describedby="transition-modal-description"
+                    className={classes.modal}
+                    open={open}
+                    onClose={handleClose}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                        timeout: 500,
+                    }}
+                >
+                    <Fade in={open}>
+                        <div className={classes.paper}>
+                            <h4 id="transition-modal-title">{clientReceiverLabel}:{clientReceiver?.name}</h4>
+                            <h5 id="transition-modal-title">{clientReceiverLabel} Email: {clientReceiver?.email}</h5>
+                            <Button onClick={doTransaction}>{sendLabel}</Button>
+                            <Button onClick={handleClose}>{cancelLabel}</Button>
+                        </div>
+                    </Fade>
+                </Modal>
+            </div>
             <div className={classes.paper}>
                 <div className="m-2 d-flex justify-content-center align-items-center ">
                     {
@@ -175,13 +221,15 @@ export default function SendMoney() {
                             setClientReceiver(newValue);
                             console.log(newValue)
                         }}
-                        renderInput={(params) => <TextField {...params} label={clientReceiverLabel} variant="outlined" />}
+                        renderInput={(params) => <TextField
+                            required {...params} label={clientReceiverLabel} variant="outlined" />}
                     />
                     <InputLabel id="demo-simple-select-label">{currencyLabel}</InputLabel>
                     <Select
                         value={currency}
                         variant="outlined"
                         fullWidth
+                        required
                         onChange={(event)=>{
                             setCurrency(event.target.value);
                         }}>

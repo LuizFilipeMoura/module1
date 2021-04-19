@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {useRouter} from "next/router";
-import {DATABASE_URL, DEPOSITS, PASTTRADES, WITHDRAWS} from "../shared/enviroment";
+import {DATABASE_URL, WITHDRAWS} from "../shared/enviroment";
 import {useAppContext} from "../shared/AppWrapper";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -52,7 +52,7 @@ export default function Withdraw() {
     let amountLabel = router.locale === 'en-US' ? 'Amount' : 'Montante';
     let saveLabel = router.locale === 'en-US' ? 'Request Withdraw' : 'Requerir Saque';
     let forexAccountLabel = router.locale === 'en-US' ? 'Account:' : 'Conta:';
-    let withdrawInstructionsLabel = router.locale === 'en-US' ? 'The withdraw will be done in these following account:'
+    let withdrawInstructionsLabel = router.locale === 'en-US' ? 'The withdraw will be done in this following account:'
         : 'O saque será feito na seguinte conta:';
     let withdrawLabel = router.locale === 'en-US' ? 'Withdraw' : 'Saque';
     let dateLabel = router.locale === 'en-US' ? 'Date' : 'Data';
@@ -185,6 +185,7 @@ export default function Withdraw() {
 
                                     <p>{accountNumberLabel}: {(context.client.account_number)}</p>
                                     <p>{nameLabel}{context.client.name?.toUpperCase()}</p>
+                                    <p>{nameLabel}{context.client.name?.toUpperCase()}</p>
                                 </span> : ''
                         }
 
@@ -208,7 +209,15 @@ export default function Withdraw() {
                     <div className="d-flex justify-content-center align-items-center" >
                         {withdraw.status === 'DONE'?
                             <div className="alert alert-success w-100" role="alert">
-                                <p>{withdrawLabel}</p> {withdraw.amount} {withdraw.currency}  {withdraw.status}
+                                <p>{withdrawLabel} {withdraw.status}</p> <strong>
+                                <p>{amountLabel}: {withdraw.amount}</p>
+                                <p>{currencyLabel}: {withdraw.currency}</p>
+                            </strong>
+                                <p>{dateLabel}: {(new Date(withdraw.date)).toLocaleDateString() + ' '+ (new Date(withdraw.date)).getHours() + ':' +
+                                ((new Date(withdraw.date)).getUTCMinutes() <= 9? '0' + (new Date(withdraw.date)).getUTCMinutes(): (new Date(withdraw.date)).getUTCMinutes() ) }</p>
+                                {withdraw.obs && withdraw.obs !== '' ?
+                                    <p>{currencyLabel}: {withdraw.obs}</p>: ''}
+
                             </div>
                             :
                             <div className="alert alert-danger w-100" role="alert">
@@ -218,6 +227,8 @@ export default function Withdraw() {
                             </strong>
                                 <p>{dateLabel}: {(new Date(withdraw.date)).toLocaleDateString() + ' '+ (new Date(withdraw.date)).getHours() + ':' +
                                 ((new Date(withdraw.date)).getUTCMinutes() <= 9? '0' + (new Date(withdraw.date)).getUTCMinutes(): (new Date(withdraw.date)).getUTCMinutes() ) }</p>
+                                {withdraw.obs && withdraw.obs !== '' ?
+                                    <p>{currencyLabel}: {withdraw.obs}</p>: ''}
                             </div>
                         }
 
