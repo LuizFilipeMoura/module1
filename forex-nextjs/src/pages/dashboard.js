@@ -47,8 +47,8 @@ export default function Dashboard() {
 
     let [buyingCurrency, setBuyingCurrency] = React.useState(currencies[0][0]);
     let [sellingCurrency, setSellingCurrency] = React.useState(currencies[1][0]);
-    let [buyingSymbolCurrency, setBuyingSymbolCurrency] = React.useState(currencies[0][1]);
-    let [sellingSymbolCurrency, setSellingSymbolCurrency] = React.useState(currencies[1][1]);
+    let [buyingSymbol, setBuyingSymbol] = React.useState();
+    let [sellingSymbol, setSellingSymbol] = React.useState();
     let [buyingAmount, setBuyingAmount] = React.useState(0.00);
     let [sellingAmount, setSellingAmount] = React.useState(0.00);
 
@@ -78,6 +78,31 @@ export default function Dashboard() {
         //If the user is not loggedin, send to the login page
         if(!context.isLogged && !localStorage.getItem('isLogged')){
             router.push(router.locale+'/')
+        }
+        //Adjust the symbol
+        if(sellingCurrency === 'EUR'){
+            setSellingSymbol('€');
+        }
+        if(sellingCurrency === 'BRL'){
+            setSellingSymbol('R$');
+        }
+        if(sellingCurrency === 'GBP'){
+            setSellingSymbol('£');
+        }
+        if(sellingCurrency === 'USD'){
+            setSellingSymbol('$');
+        }
+        if(buyingCurrency === 'EUR'){
+            setBuyingSymbol('€');
+        }
+        if(buyingCurrency === 'BRL'){
+            setBuyingSymbol('R$');
+        }
+        if(buyingCurrency === 'GBP'){
+            setBuyingSymbol('£');
+        }
+        if(buyingCurrency === 'USD'){
+            setBuyingSymbol('$');
         }
     });
 
@@ -154,9 +179,7 @@ export default function Dashboard() {
             });
             updatesWallet(transaction)
         }
-
     }
-
 
     function handleCurrencyInput(operation, value){ //Calculates the amount of each currency the user has after the input
         if(operation === 0){//If the operation is buying
@@ -246,7 +269,7 @@ export default function Dashboard() {
                             <CurrencyTextField
                                 value={index === 0? buyingAmount: sellingAmount}
                                 variant="filled"
-                                currencySymbol={index === 0? buyingCurrencySymbol: sellingCurrencySymbol}
+                                currencySymbol={index === 0? buyingSymbol: sellingSymbol}
                                 id={index === 0? 'buyingAmountInput': 'sellingAmountInput'}
                                 name="input-name"
                                 placeholder={placeholderLabel}
@@ -270,7 +293,6 @@ export default function Dashboard() {
                                     onChange={(event)=>{
                                         if(event.target.value !== 'USD' && sellingCurrency !=='USD'){
                                             setSellingCurrency('USD');
-                                            setSellingCurrency('$');
                                         }
                                         setBuyingCurrency(event.target.value);
                                         setBuyingAmount(0);
