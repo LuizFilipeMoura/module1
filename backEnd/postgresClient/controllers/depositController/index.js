@@ -1,7 +1,6 @@
 const connect = require('../../dbConnect/db').connect();
 
-//Gets all the past trades for that client
-
+//Gets all the deposits for that client
 async function post(req, res, next) {
     console.log(req.body);
     if(req.body && req.body.id){
@@ -18,6 +17,7 @@ async function post(req, res, next) {
     }
 }
 
+//Insert a new deposit in that users history
 async function put(req, res, next){
     if(req.body &&
         req.body.amount &&

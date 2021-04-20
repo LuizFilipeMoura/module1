@@ -10,8 +10,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {useRouter} from "next/router";
-import {CLIENTS, DATABASE_URL, DEPOSITS, WITHDRAWS} from "../shared/enviroment";
-import {useAppContext} from "../shared/AppWrapper";
+import {CLIENTS, DATABASE_URL, DEPOSITS, WITHDRAWS} from "../../shared/enviroment";
+import {useAppContext} from "../../shared/AppWrapper";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -19,6 +19,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
+import CurrencyTextField from "@unicef/material-ui-currency-textfield";
 
 
 const {useState} = require("react");
@@ -61,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function SendMoney() {
+export default function Index() {
     let context = useAppContext();
 
     const classes = useStyles();
@@ -69,40 +70,60 @@ export default function SendMoney() {
     let router = useRouter();
 
     let sendMoneyLabel = router.locale === 'en-US' ? 'Send Money' : 'Enviar dinheiro';
-
     let sendLabel = router.locale === 'en-US' ? 'Send!' : 'Enviar!';
     let currencyLabel = router.locale === 'en-US' ? 'Currency' : 'Moeda';
     let amountLabel = router.locale === 'en-US' ? 'Amount' : 'Montante';
     let clientReceiverLabel = router.locale === 'en-US' ? 'Receiver\'s name' : 'Nome do Recebedor';
-
+    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
+    let failTransactionLabel = router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ';
+    let cancelLabel = router.locale === 'en-US' ? 'Cancel' : 'Cancelar';
 
     let [clients, setClients] = useState('');
     let [clientReceiver, setClientReceiver] = useState();
     let [currency, setCurrency] = useState('USD');
     let [amount, setAmount] = useState(0);
+    let [showAlert, setAlert] = React.useState('');
+    const [disabled, setDisabled] = useState(false);
+    const [open, setOpen] = React.useState(false);
 
-    useEffect(() => { //Stores the user in the localstorage
+    useEffect(() => {
+
+        //List all the users
         if (clients === ''){
             listClients();
         }
+
+        //If there is information in the router query it is applied to the form
+        if(Object.entries(router.query).length !== 0){
+            for(const client of clients){
+                if(Number(router.query.receiver_id ) === client.id){
+                    setClientReceiver(client);
+                }
+            }
+            setAmount(router.query.amount);
+            setCurrency(router.query.currency);
+            setDisabled(true);
+        }
+
+        //If the user is not logged in it is redirected to the login page
         if(!context.isLogged && !localStorage.getItem('isLogged')){
             router.push(router.locale+'/')
         }
     });
 
 
-    function listClients(){//Lists the trades on the dataBase for that client
+    function listClients(){//Lists all the clients of the system
 
         axios.get(DATABASE_URL + CLIENTS)
             .then(response => {
                 setClients(response.data);
-                console.log(response);
             })
             .catch(err => {
                 console.log("oppps", err);
             });
     }
 
+    //Show messages
     function rejectTransaction(){
         setAlert('fail');
         setTimeout(function(){ setAlert(''); }, 3000);
@@ -112,15 +133,18 @@ export default function SendMoney() {
         setTimeout(function(){ setAlert(''); }, 3000);
     }
 
+    //Deposit the money for the person receiving it
+
     function handleDeposit(){
-        let request = {id: clientReceiver.id, currency, amount, status: 'DONE', obs: ('SENT BY ' + context.name)};
+        let request = {id: clientReceiver.id, currency, amount, status: 'DONE', obs: ('SENT BY ' + context.client.name)};
         axios.put(DATABASE_URL + DEPOSITS, request).then( res => {
             sucessfulTransaction();
-            handleClose()
+            handleClose();
             context.updateContext(context);
         })
     }
 
+    //Withdraw the money for the person sending it
     function handleWithdraw(event){
         event.preventDefault();
 
@@ -137,12 +161,6 @@ export default function SendMoney() {
         }
     }
 
-    let [showAlert, setAlert] = React.useState('');
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
-    let failTransactionLabel = router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ';
-
-    const [open, setOpen] = React.useState(false);
-
     const handleOpen = (event) => {
         setOpen(true);
     };
@@ -151,6 +169,7 @@ export default function SendMoney() {
         setOpen(false);
     };
 
+    //Handles the confirmation of the user
     function doTransaction() {
         let request = {id: context.client.id, currency, amount, status: 'DONE', obs: ('SENT TO ' + clientReceiver.name)};
         axios.put(DATABASE_URL + WITHDRAWS, request).then(res => {
@@ -159,11 +178,9 @@ export default function SendMoney() {
             handleDeposit()
         });
     }
-    let cancelLabel = router.locale === 'en-US' ? 'Cancel' : 'Cancelar';
 
     return (
         <Container component="main" maxWidth="xs">
-
             <CssBaseline />
             <div>
                 <Modal
@@ -189,6 +206,7 @@ export default function SendMoney() {
                 </Modal>
             </div>
             <div className={classes.paper}>
+                {/*Message Alert*/}
                 <div className="m-2 d-flex justify-content-center align-items-center ">
                     {
                         showAlert === 'success'?
@@ -210,26 +228,43 @@ export default function SendMoney() {
                     {sendMoneyLabel}
                 </Typography>
                 <form className={classes.form} onSubmit={handleWithdraw}>
-                    <Autocomplete
-                        id="combo-box-demo"
-                        options={clients}
-                        classes={{
-                            option: classes.option
-                        }}
-                        getOptionLabel={(option) => option.name}
-                        onChange={(event, newValue) => {
-                            setClientReceiver(newValue);
-                            console.log(newValue)
-                        }}
-                        renderInput={(params) => <TextField
-                            required {...params} label={clientReceiverLabel} variant="outlined" />}
-                    />
+                    {clientReceiver ?
+                        <TextField
+                            type="text"
+                            variant="outlined"
+                            margin="normal"
+                            value={clientReceiver.name}
+                            name="client"
+                            fullWidth
+                            disabled={disabled}
+                            label={clientReceiverLabel}
+                        />
+                    :
+                        //Automcomplete field with all the users listed
+
+                        <Autocomplete
+                            id="combo-box-demo"
+                            options={clients}
+                            classes={{
+                                option: classes.option
+                            }}
+                            getOptionLabel={(option) => option.name}
+                            onChange={(event, newValue) => {
+                                setClientReceiver(newValue);
+                            }}
+                            renderInput={(params) => <TextField
+                                required {...params} label={clientReceiverLabel} variant="outlined" />}
+                        />
+                    }
+
                     <InputLabel id="demo-simple-select-label">{currencyLabel}</InputLabel>
                     <Select
                         value={currency}
                         variant="outlined"
                         fullWidth
                         required
+                        disabled={disabled}
+
                         onChange={(event)=>{
                             setCurrency(event.target.value);
                         }}>
@@ -239,16 +274,22 @@ export default function SendMoney() {
                             </MenuItem>
                         )}
                     </Select>
-                    <TextField
-                        type="number"
+                    <CurrencyTextField
+                        value={amount}
+                        style={{marginTop: '15px'}}
+                        disabled={disabled}
                         variant="outlined"
-                        margin="normal"
-                        min="0"
-                        required
-                        fullWidth
-                        name="amount"
-                        onChange={(event) => setAmount(event.target.value)}
+                        name="input-name"
                         label={amountLabel}
+                        defaultValue={0.00}
+                        fullWidth
+                        decimalsLimit={2}
+                        decimalCharacter="."
+                        digitGroupSeparator=""
+                        onChange={(textValue, name) => {
+                            let value = Number(textValue.target.value);
+                            setAmount(value)
+                        }}
                     />
                     <Button
                         type="submit"

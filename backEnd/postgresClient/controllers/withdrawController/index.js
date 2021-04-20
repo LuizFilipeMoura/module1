@@ -1,7 +1,6 @@
 const connect = require('../../dbConnect/db').connect();
 
-//Gets all the past trades for that client
-
+//Gets all the withdraws for that client
 async function post(req, res, next) {
     console.log(req.body);
     if(req.body && req.body.id){
@@ -17,7 +16,7 @@ async function post(req, res, next) {
         res.send('error! Request Body is not complete');
     }
 }
-
+//Insert a new withdraw for that client
 async function put(req, res, next){
     if(req.body &&
         req.body.amount &&
@@ -43,6 +42,5 @@ async function put(req, res, next){
         console.log('error! Request Body is not complete');
         res.send('error! Request Body is not complete');
     }
-
 }
 module.exports = { post, put };

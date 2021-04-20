@@ -7,6 +7,7 @@ import AccountBalanceIcon from "@material-ui/icons/AccountBalance";
 import HistoryIcon from "@material-ui/icons/History";
 import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
+import MoneyIcon from '@material-ui/icons/Money';
 import SendIcon from '@material-ui/icons/Send';
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
@@ -31,6 +32,7 @@ const DrawerList = ({props}) => {
 
     let router = useRouter();
 
+    //I18n labels
     let dashboardLabel = router.locale === 'en-US' ? 'Dashboard' : 'Painel';
     let profileLabel= router.locale === 'en-US' ? 'Profile' : 'Perfil';
     let bankInfoLabel= router.locale === 'en-US' ? 'Bank Info' : 'Informações bancárias';
@@ -39,6 +41,7 @@ const DrawerList = ({props}) => {
     let historyLabel= router.locale === 'en-US' ? 'History' : 'Histórico';
     let logoutLabel= router.locale === 'en-US' ? 'Logout' : 'Sair';
     let sendMoneyLabel= router.locale === 'en-US' ? 'Send Money' : 'Enviar Dinheiro';
+    let chargeMoneyLabel= router.locale === 'en-US' ? 'Charge' : 'Cobrar';
 
 
     const toggleDrawer = (anchor, open) => (event) => {//Toggles Side Drawer
@@ -48,6 +51,7 @@ const DrawerList = ({props}) => {
         setState({ ...state, [anchor]: open });
     };
 
+    //The list of buttons inside the drawer
     return (
 
         <>
@@ -60,16 +64,22 @@ const DrawerList = ({props}) => {
                 onKeyDown={toggleDrawer('right', false)}
             >
                 <List>
-                    {[profileLabel, bankInfoLabel, historyLabel, withdrawLabel, depositLabel, dashboardLabel,sendMoneyLabel, logoutLabel].map((text, index) => (
+
+                    {/*Go through all the options available inside the drawer*/}
+
+                    {[profileLabel, bankInfoLabel, historyLabel, withdrawLabel, depositLabel, dashboardLabel,sendMoneyLabel,chargeMoneyLabel, logoutLabel].map((text, index) => (
                         <ListItem button key={text} onClick={()=>
-                            router.push(router.locale +'/' + (index === 0 ? 'profile'
+
+                            router.push({ pathname: router.locale +'/' + (index === 0 ? 'profile'
                                 : index === 1 ? 'bank-info'
                                     : index === 2 ? 'history'
                                         : index === 3 ? 'withdraw'
                                             : index === 4 ? 'deposit'
                                                 : index === 5 ? 'dashboard'
-                                                    : index === 6 ? 'sendmoney'
-                                                        :''))}>
+                                                    : index === 6 ? `sendmoney`
+                                                        : index === 7 ? 'chargeForMoney'
+                                                            : '')
+                            }) }>
                             <ListItemIcon>
                                 {index === 0 ? <AccountCircleIcon />
                                     : index === 1 ? <AccountBalanceIcon />
@@ -78,7 +88,8 @@ const DrawerList = ({props}) => {
                                                 : index === 4 ? <AttachMoneyIcon/>
                                                     : index === 5 ?<DashboardIcon/>
                                                         : index === 6 ?<SendIcon/>
-                                                            : <ExitToAppIcon/>
+                                                            : index === 7 ?<MoneyIcon/>
+                                                                : <ExitToAppIcon/>
 
                                 }
                             </ListItemIcon>

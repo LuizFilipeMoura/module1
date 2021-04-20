@@ -1,7 +1,6 @@
 //Imports the libs to be used
 
 const WebSocket = require('ws');
-const axios = require('axios');
 const TRADE_API = "https://openexchangerates.org/api/latest.json?app_id=fefd1e002fa444cba0ca8a211cde33a3";
 const oxr = require('open-exchange-rates');
 const  fx = require('money');
@@ -9,8 +8,8 @@ const  fx = require('money');
 oxr.set({ app_id: 'fefd1e002fa444cba0ca8a211cde33a3' });
 
 //Open the server
-const wss = new WebSocket.Server({ port: 8001 });
-console.log("Server open in port 8001");
+const wss = new WebSocket.Server({ port: 8002 });
+console.log("Server open in port 8002");
 let infoBundle = {}
     = { usdTOgbp: 0.728646, usdTOeur: 0.840607, usdTObrl: 5.733826 }
 ;
@@ -18,7 +17,7 @@ let infoBundle = {}
 //Handles the connection to the websocket, calls the schedueler caller of the API
 wss.on('connection', function connection(ws) {
 
-    ws.send('Hello');
+    ws.send(JSON.stringify(infoBundle));
     console.log('sent hello');
     // getQuoteRightNow()
     //     .then(response => {

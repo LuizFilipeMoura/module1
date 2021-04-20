@@ -35,9 +35,7 @@ async function signUp(req, res, next){
             res.send('Email taken');
         }else{
             const sql = 'INSERT INTO clients (name, email, password, birthdate) VALUES ($1,$2,$3, $4);';
-
             const values = [ req.body.name, req.body.email, req.body.password, req.body.birthdate ]; //Query Values
-
             await client.query(sql, values); //Executes the query
             console.log('success');
             res.send('success');
@@ -62,6 +60,8 @@ async function put(req, res, next){
         console.log('success');
         res.send('success');
 }
+
+//Lists the clients for the autocomplete input
 async function get(req, res, next){
     const sql = 'SELECT id,name, email from clients';
     const client =  (await connect);

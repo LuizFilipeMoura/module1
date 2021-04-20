@@ -16,7 +16,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import { useAppContext} from "../shared/AppWrapper";
 
-const wsClient = new W3CWebSocket(WEBSOCKET_URL); //WebSocket Connection
+
 
 const useStyles = makeStyles({//Define the style of the page
     list: {
@@ -38,10 +38,9 @@ const useStyles = makeStyles({//Define the style of the page
 });
 
 export default function Dashboard() {
+    const [once, setOnce] = React.useState(true);
+
     const classes = useStyles();
-    const [state, setState] = React.useState({
-        left: false,
-    });
     let [rate, setRate] = useState({});
     let context = useAppContext();
     let currencies = context.currencies;
@@ -65,10 +64,16 @@ export default function Dashboard() {
     let successTransactionLabel = router.locale === 'en-US' ? '✓ Transaction Successful! Wallet and History updated'
         : '✓ Transação Bem-sucedida! Carteira e histórico atualizadas';
     let failTransactionLabel = router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ';
+    let placeholderLabel = router.locale === 'en-US' ? 'Please insert amount here' : 'Por favor informar o montante aqui';
 
+    const wsClient = new W3CWebSocket(WEBSOCKET_URL); //WebSocket Connection
 
-    useEffect(() => { //Stores the user in the localstorage
-        handlesWebsocket();
+    useEffect(() => {
+        if(once){
+            handlesWebsocket();
+            setOnce(false);
+        }
+        //If the user is not loggedin, send to the login page
         if(!context.isLogged && !localStorage.getItem('isLogged')){
             router.push(router.locale+'/')
         }
@@ -118,7 +123,6 @@ export default function Dashboard() {
         wsClient.onmessage = (message) => {
             const dataFromServer = JSON.parse(message.data);
             setRate(dataFromServer);//Get the rate value from the websocket and refreshs the the current values
-            rate = dataFromServer;
         };
     }
 
@@ -190,7 +194,6 @@ export default function Dashboard() {
                     setBuyingAmount(value * (1/rate.usdTOgbp))
                 }
             } else {
-
                 if(buyingCurrency === 'EUR'){
                     setBuyingAmount(value * (rate.usdTOeur))
                 }
@@ -244,7 +247,7 @@ export default function Dashboard() {
                                 currencySymbol={currency[1]}
                                 id={index === 0? 'buyingAmountInput': 'sellingAmountInput'}
                                 name="input-name"
-                                placeholder="Please enter a number"
+                                placeholder={placeholderLabel}
                                 defaultValue={0.00}
                                 decimalsLimit={2}
                                 decimalCharacter="."
@@ -252,7 +255,6 @@ export default function Dashboard() {
                                 onChange={(textValue, name) => {
                                     let value = Number(textValue.target.value);
                                     handleCurrencyInput(index, value);
-
                                 }}
                             />
 
@@ -365,42 +367,42 @@ export default function Dashboard() {
                                 </CardContent>
                             </CardActionArea>
                             <CardActions>
-                                {/*<Button size="small" color="secondary" onClick={()=> {*/}
-                                {/*    setBuyingAmount(0);*/}
-                                {/*    setSellingAmount(0);*/}
+                                <Button size="small" color="secondary" onClick={()=> {
+                                    setBuyingAmount(0);
+                                    setSellingAmount(0);
 
-                                {/*    if(sellingCurrency !== currency[0]){*/}
-                                {/*        setBuyingCurrency(currency[0])*/}
-                                {/*    }*/}
-                                {/*    else {*/}
-                                {/*        setSellingCurrency(buyingCurrency);*/}
-                                {/*        setBuyingCurrency(currency[0]);*/}
-                                {/*    }*/}
-                                {/*    if(currency[0] !== 'USD' && sellingCurrency !== 'USD'){*/}
-                                {/*        setSellingCurrency('USD');*/}
-                                {/*    }*/}
-                                {/*}}>*/}
-                                {/*    {buyButtonLabel}*/}
-                                {/*</Button>*/}
-                                {/*<Button size="small" color="secondary" onClick={()=> {*/}
-                                {/*    setBuyingAmount(0);*/}
-                                {/*    setSellingAmount(0);*/}
-                                {/*    if(buyingCurrency !== currency[0]){*/}
-                                {/*        setSellingCurrency(currency[0])*/}
-                                {/*    }*/}
-                                {/*    else if ( currency[0] !== 'USD'){*/}
-                                {/*        setBuyingCurrency(buyingCurrency);*/}
-                                {/*        setSellingCurrency(currency[0]);*/}
-                                {/*    } else {*/}
-                                {/*        setBuyingCurrency(sellingCurrency);*/}
-                                {/*        setSellingCurrency('USD');*/}
-                                {/*    }*/}
-                                {/*    if(currency[0] !== 'USD' && buyingCurrency !== 'USD'){*/}
-                                {/*        setBuyingCurrency('USD');*/}
-                                {/*    }*/}
-                                {/*}}>*/}
-                                {/*    {sellButtonLabel}*/}
-                                {/*</Button>*/}
+                                    if(sellingCurrency !== currency[0]){
+                                        setBuyingCurrency(currency[0])
+                                    }
+                                    else {
+                                        setSellingCurrency(buyingCurrency);
+                                        setBuyingCurrency(currency[0]);
+                                    }
+                                    if(currency[0] !== 'USD' && sellingCurrency !== 'USD'){
+                                        setSellingCurrency('USD');
+                                    }
+                                }}>
+                                    {buyButtonLabel}
+                                </Button>
+                                <Button size="small" color="secondary" onClick={()=> {
+                                    setBuyingAmount(0);
+                                    setSellingAmount(0);
+                                    if(buyingCurrency !== currency[0]){
+                                        setSellingCurrency(currency[0])
+                                    }
+                                    else if ( currency[0] !== 'USD'){
+                                        setBuyingCurrency(buyingCurrency);
+                                        setSellingCurrency(currency[0]);
+                                    } else {
+                                        setBuyingCurrency(sellingCurrency);
+                                        setSellingCurrency('USD');
+                                    }
+                                    if(currency[0] !== 'USD' && buyingCurrency !== 'USD'){
+                                        setBuyingCurrency('USD');
+                                    }
+                                }}>
+                                    {sellButtonLabel}
+                                </Button>
                             </CardActions>
                         </Card>
                     ))}

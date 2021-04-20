@@ -17,7 +17,7 @@ const useStyles = makeStyles({//Define the style of the page
 });
 
 const Navbar = ({currencies, wallet, client}) => {
-    let router = useRouter();
+
     let context = useAppContext();
     const classes = useStyles();
     const [state, setState] = React.useState({
@@ -25,14 +25,11 @@ const Navbar = ({currencies, wallet, client}) => {
     });
     const [once, setOnce] = React.useState(true);
 
-
-        useEffect(() => { //Stores the user in the localstorage
-            if(once){
-                context.updateContext(context);
-                setOnce(false);
-            }
-
-
+    useEffect(() => { //Stores the user in the localstorage
+        if(once){
+            context.updateContext(context);
+            setOnce(false);
+        }
     });
 
     const toggleDrawer = (anchor, open) => (event) => {//Toggles Side Drawer
@@ -42,6 +39,7 @@ const Navbar = ({currencies, wallet, client}) => {
         setState({ ...state, [anchor]: open });
     };
 
+    //If the wallet exists, show it to the user
     if(wallet && Object.entries(wallet).length !== 0) //Shows the navbar just when there are values inside the wallet
         return(
             <div className="m-2 row ">
@@ -53,6 +51,7 @@ const Navbar = ({currencies, wallet, client}) => {
                     </Drawer>
                 </React.Fragment>
 
+            {/*    Show the amount of each currency*/}
             {currencies? currencies.map((currency) => (
                 <div className="m-2" key={currency[0]}>
                     <p className="h5" key={currency[0]}>

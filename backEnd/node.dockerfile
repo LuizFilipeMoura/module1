@@ -1,20 +1,19 @@
 # Choose the Image which has Node installed already
 FROM node:alpine
 
-# COPY all the files from Current Directory into the Container
-RUN mkdir /app
+# Create app directory
+WORKDIR /usr/src/app
 
-WORKDIR /app
+# Install app dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
+COPY package*.json ./
 
-COPY package.json /app
-COPY ./ /app
-
-
-# Install the Project Dependencies like Express Framework
 RUN npm install
 
+# Bundle app source
+COPY . .
 
-# Tell that this image is going to Open a Port
 EXPOSE 8000
 
 # Default Command to launch the Application

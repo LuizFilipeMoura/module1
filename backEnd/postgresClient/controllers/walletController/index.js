@@ -13,7 +13,6 @@ async function post(req, res, next) {
         res.status(400);
         console.log('error! Request Body is not complete');
         res.send('error! Request Body is not complete');
-        return -1;
     }
 }
 
@@ -21,10 +20,13 @@ async function post(req, res, next) {
 async function put(req, res, next){
 
     console.log(req.body);
-    if(req.body && req.body.dollaramount && req.body.poundamount && req.body.euroamount && req.body.realamount && req.body.client_id){
+    if(req.body  && req.body.client_id){
         const client =  (await connect);
         const sql = 'UPDATE wallets set dollarAmount = $1, poundamount = $2, euroamount = $3, realamount=$4 where client_id = $5';
-        const values = [ req.body.dollaramount, req.body.poundamount,req.body.euroamount,req.body.realamount, req.body.client_id]; // Query values
+        const values = [ req.body.dollaramount? req.body.dollaramount : 0,
+            req.body.poundamount? req.body.poundamount : 0,
+            req.body.euroamount? req.body.euroamount : 0,
+            req.body.realamount? req.body.realamount : 0, req.body.client_id]; // Query values
 
         await client.query(sql, values); //Executes the query
         console.log('success');
@@ -34,10 +36,7 @@ async function put(req, res, next){
         res.status(400);
         console.log('error! Request Body is not complete');
         res.send('error! Request Body is not complete');
-        return -1;
     }
-
-
 }
 
 module.exports = { post, put,};

@@ -19,6 +19,7 @@
     "next": "^10.0.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
+    "react-qr-code": "^1.1.1",
     "websocket": "^1.0.33"
   },
   "devDependencies": {

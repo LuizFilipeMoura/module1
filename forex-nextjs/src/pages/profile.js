@@ -48,13 +48,16 @@ export default function SignIn() {
     let nameLabel = router.locale === 'en-US' ? 'Name' : 'Nome';
     let profileLabel = router.locale === 'en-US' ? 'Profile' : 'Perfil';
     let saveLabel = router.locale === 'en-US' ? 'Save' : 'Salvar';
+    let successTransactionLabel = router.locale === 'en-US' ? '✓ Profile saved' : '✓ Perfil salvo!';
 
-
+    let [showAlert, setAlert] = React.useState('');
     let [email, setEmail] = useState('');
     let [name, setName] = useState('');
     let [birthdate, setBirthdate] = useState('');
 
-    useEffect(() => { //Stores the user in the localstorage
+    useEffect(() => {
+        //If the user has valid data, show it here
+
         if (email === '' && name ==='' && context.client){
             setEmail(context.client.email);
             setName(context.client.name);
@@ -71,11 +74,15 @@ export default function SignIn() {
         return re.test(String(givenEmail).toLowerCase());
     }
 
-    function handleSignUp(event){
+    function handleProfileChanging(event){
+
+        //Validates the user data
         event.preventDefault();
         if(!validateEmail(email)) {
             alert('Invalid Email!')
         } else {
+
+            //Stores the user data if it is valid
             let user = {id: context.client.id,
                 name,
                 email,
@@ -90,9 +97,6 @@ export default function SignIn() {
             })
         }
     }
-
-    let [showAlert, setAlert] = React.useState('');
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ Profile saved' : '✓ Perfil salvo!';
 
     function sucessful(){
         setAlert('success');
@@ -118,7 +122,7 @@ export default function SignIn() {
                 <Typography component="h1" variant="h5">
                     {profileLabel}
                 </Typography>
-                <form className={classes.form} onSubmit={handleSignUp}>
+                <form className={classes.form} onSubmit={handleProfileChanging}>
                     <TextField
                         variant="outlined"
                         margin="normal"
@@ -171,13 +175,6 @@ export default function SignIn() {
                     >
                         {saveLabel}
                     </Button>
-                    <Grid container>
-                        {/*<Grid item xs>*/}
-                        {/*    <Link href="#" variant="body2">*/}
-                        {/*        Forgot password?*/}
-                        {/*    </Link>*/}
-                        {/*</Grid>*/}
-                    </Grid>
                 </form>
             </div>
         </Container>

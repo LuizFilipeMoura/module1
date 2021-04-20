@@ -39,36 +39,37 @@ const useStyles = makeStyles((theme) => ({
 
 export default function BankInfo() {
     let context = useAppContext();
-
     const classes = useStyles();
-
     let router = useRouter();
 
     let bankNumberLabel = router.locale === 'en-US' ? 'Bank Number' : 'Número do Banco';
     let accountNumberLabel = router.locale === 'en-US' ? 'Account Number' : 'Número da conta';
     let saveLabel = router.locale === 'en-US' ? 'Save Info' : 'Salvar Info';
     let bankInfoLabel = router.locale === 'en-US' ? 'Bank Info' : 'Informações Bancárias';
-
+    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
 
     let [bankNumber, setBankNumber] = useState('');
     let [accountNumber, setAccountNumber] = useState('');
+    let [showAlert, setAlert] = React.useState('');
 
     function handleSaveInfo(event){
         event.preventDefault();
         let user = context.client;
         user.bank_number = Number(bankNumber);
         user.account_number = Number(accountNumber);
-        console.log(user);
         axios.put(DATABASE_URL + CLIENTS, user).then( res => {
             sucessful();
         })
     }
 
-    useEffect(() => { //Stores the user in the localstorage
+    useEffect(() => {
+        //If there is bank info already, show it
         if (bankNumber === '' && accountNumber ===''){
             setBankNumber(context.client.bank_number);
             setAccountNumber(context.client.account_number);
         }
+
+        //If the user is not logged in it is redirected to the login page
         if(!context.isLogged && !localStorage.getItem('isLogged')){
             router.push(router.locale+'/')
         }
@@ -79,8 +80,7 @@ export default function BankInfo() {
         setTimeout(function(){ setAlert(''); }, 3000);
     }
 
-    let [showAlert, setAlert] = React.useState('');
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />

@@ -3,7 +3,6 @@ import React, {useEffect} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
 import axios from "axios";
 import 'date-fns';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -16,6 +15,7 @@ import {useAppContext} from "../shared/AppWrapper";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
+import CurrencyTextField from "@unicef/material-ui-currency-textfield";
 
 
 const {useState} = require("react");
@@ -51,25 +51,35 @@ export default function Withdraw() {
     let currencyLabel = router.locale === 'en-US' ? 'Currency' : 'Moeda';
     let amountLabel = router.locale === 'en-US' ? 'Amount' : 'Montante';
     let saveLabel = router.locale === 'en-US' ? 'Request Withdraw' : 'Requerir Saque';
-    let forexAccountLabel = router.locale === 'en-US' ? 'Account:' : 'Conta:';
     let withdrawInstructionsLabel = router.locale === 'en-US' ? 'The withdraw will be done in this following account:'
         : 'O saque será feito na seguinte conta:';
     let withdrawLabel = router.locale === 'en-US' ? 'Withdraw' : 'Saque';
     let dateLabel = router.locale === 'en-US' ? 'Date' : 'Data';
+    let bankInfoAlert = router.locale === 'en-US' ? 'Bank info are not correct' : 'Informações bancárias insuficientes';
+    let bankNumberLabel = router.locale === 'en-US' ? 'Bank Number' : 'Número do Banco';
+    let accountNumberLabel = router.locale === 'en-US' ? 'Account Number' : 'Número da conta';
+    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
+    let nameLabel = router.locale === 'en-US' ? 'Name: ' : 'Nome: ';
+    let failTransactionLabel = router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ';
 
 
-
+    let [showAlert, setAlert] = React.useState('');
     let [currency, setCurrency] = useState('');
     let [amount, setAmount] = useState(0);
     let [withdraws, setWithdraws] = useState();
 
-
-    useEffect(() => { //Stores the user in the localstorage
+    useEffect(() => {
+        //List All the withdraws fot that client
         if(!withdraws){
             listWithdraws();
         }
         if(!context.isLogged && !localStorage.getItem('isLogged')){
             router.push(router.locale+'/')
+        }
+        //If the user doesn`t have valid bank info it redirects to the bank info page
+        if(context.client && (!context.client.bank_number || !context.client.account_number)){
+            alert(bankInfoAlert);
+            router.push(router.locale+'/bank-info')
         }
     });
 
@@ -107,6 +117,8 @@ export default function Withdraw() {
         }else if(currency === 'GBP' && amount > context.wallet.poundamount){
             rejectTransaction()
         } else{
+
+            //If the user can afford the withdraw, stores it in the database, The DB automatically subtracts the amount from the wallet
             axios.put(DATABASE_URL + WITHDRAWS, request).then( res => {
                 sucessfulTransaction();
                 listWithdraws();
@@ -115,15 +127,6 @@ export default function Withdraw() {
         }
     }
 
-    let [showAlert, setAlert] = React.useState('');
-
-    let bankNumberLabel = router.locale === 'en-US' ? 'Bank Number' : 'Número do Banco';
-
-    let accountNumberLabel = router.locale === 'en-US' ? 'Account Number' : 'Número da conta';
-
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
-    let nameLabel = router.locale === 'en-US' ? 'Name: ' : 'Nome: ';
-    let failTransactionLabel = router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ';
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -165,18 +168,22 @@ export default function Withdraw() {
                                 </MenuItem>
                         )}
                     </Select>
-                    <TextField
-                        type="number"
+                    <CurrencyTextField
+                        style={{marginTop: '15px'}}
                         variant="outlined"
-                        margin="normal"
-                        min="0"
-                        required
-                        fullWidth
-                        name="amount"
-                        onChange={(event) => setAmount(event.target.value)}
+                        name="input-name"
                         label={amountLabel}
+                        defaultValue={0.00}
+                        fullWidth
+                        decimalsLimit={2}
+                        decimalCharacter="."
+                        digitGroupSeparator=""
+                        onChange={(textValue, name) => {
+                            let value = Number(textValue.target.value);
+                            setAmount(value)
+                        }}
                     />
-                    <span>
+                    <div className="mt-5">
                         <p>{withdrawInstructionsLabel}</p>
                         {
                             context.client?
@@ -185,12 +192,11 @@ export default function Withdraw() {
 
                                     <p>{accountNumberLabel}: {(context.client.account_number)}</p>
                                     <p>{nameLabel}{context.client.name?.toUpperCase()}</p>
-                                    <p>{nameLabel}{context.client.name?.toUpperCase()}</p>
                                 </span> : ''
                         }
 
 
-                    </span>
+                    </div>
                     <Button
                         type="submit"
                         fullWidth
@@ -204,6 +210,9 @@ export default function Withdraw() {
 
             </div>
             <div className=" mt-5 mb-5 w-100" >
+
+                {/*List all the withdraws*/}
+
                 {withdraws?.map(withdraw =>
 
                     <div className="d-flex justify-content-center align-items-center" >

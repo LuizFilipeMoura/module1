@@ -16,6 +16,7 @@ import {useAppContext} from "../shared/AppWrapper";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
+import CurrencyTextField from "@unicef/material-ui-currency-textfield";
 
 
 const {useState} = require("react");
@@ -43,9 +44,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Deposit() {
     let context = useAppContext();
-
     const classes = useStyles();
-
     let router = useRouter();
 
     let currencyLabel = router.locale === 'en-US' ? 'Currency' : 'Moeda';
@@ -56,15 +55,17 @@ export default function Deposit() {
         : 'O depóstio deverá ser feito na seguinte conta:';
     let depositLabel = router.locale === 'en-US' ? 'Deposit' : 'Depósito';
     let dateLabel = router.locale === 'en-US' ? 'Date' : 'Data';
+    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
+    let nameLabel = router.locale === 'en-US' ? 'Name: ' : 'Nome: ';
 
-
-
+    let [showAlert, setAlert] = React.useState('');
     let [currency, setCurrency] = useState('');
     let [amount, setAmount] = useState(0);
     let [deposits, setDeposits] = useState();
 
 
-    useEffect(() => { //Stores the user in the localstorage
+    useEffect(() => {
+        //List the deposits
         if(!deposits){
             listDeposits();
         }
@@ -77,7 +78,6 @@ export default function Deposit() {
 
         axios.post(DATABASE_URL + DEPOSITS, context.client)
             .then(response => {
-                console.log(response.data.rows);
                 setDeposits(response.data.rows.length === 0 ? [] : response.data.rows);
             })
             .catch(err => {
@@ -85,9 +85,13 @@ export default function Deposit() {
             });
     }
 
+    //Stores the deposit
     function handleDeposit(event){
         event.preventDefault();
         let request = {id: context.client.id, currency, amount, status: 'PENDING'};
+
+        //Stores it in the database, The DB automatically adds the amount from the wallet when it is DONE
+
         axios.put(DATABASE_URL + DEPOSITS, request).then( res => {
             sucessful();
             listDeposits();
@@ -99,9 +103,7 @@ export default function Deposit() {
         setTimeout(function(){ setAlert(''); }, 3000);
     }
 
-    let [showAlert, setAlert] = React.useState('');
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
-    let nameLabel = router.locale === 'en-US' ? 'Name: ' : 'Nome: ';
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -138,18 +140,24 @@ export default function Deposit() {
                                 </MenuItem>
                         )}
                     </Select>
-                    <TextField
-                        type="number"
+                    <CurrencyTextField
+                        style={{marginTop: '15px'}}
+
                         variant="outlined"
-                        margin="normal"
-                        min="0"
-                        required
-                        fullWidth
-                        name="amount"
-                        onChange={(event) => setAmount(event.target.value)}
+                        name="input-name"
                         label={amountLabel}
+                        defaultValue={0.00}
+                        fullWidth
+                        decimalsLimit={2}
+                        decimalCharacter="."
+                        digitGroupSeparator=""
+                        onChange={(textValue, name) => {
+                            let value = Number(textValue.target.value);
+                            setAmount(value)
+                        }}
                     />
-                    <span>
+                    <div className="mt-5">
+                        {/*Clients info for deposits*/}
                         <p>{depositInstructionsLabel}</p>
                         <p>FOREX: 0001</p>
                         {
@@ -164,7 +172,7 @@ export default function Deposit() {
                         }
 
 
-                    </span>
+                    </div>
                     <Button
                         type="submit"
                         fullWidth
@@ -178,6 +186,9 @@ export default function Deposit() {
 
             </div>
             <div className=" mt-5 mb-5 w-100" >
+
+                {/*List all the deposits for that client*/}
+
                 {deposits?.map(deposit =>
 
                     <div className="d-flex justify-content-center align-items-center" >

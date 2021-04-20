@@ -46,6 +46,7 @@ async function put(req, res, next){
     }
 
 }
+
 //Deletes one pastTrade based on its id
 async function deletePastTrade(req, res, next) {
     console.log(req.body);

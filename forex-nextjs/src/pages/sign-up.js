@@ -16,6 +16,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {useRouter} from "next/router";
 import {CLIENTS, DATABASE_URL} from "../shared/enviroment";
+import {useAppContext} from "../shared/AppWrapper";
 const md5 = require('md5');
 
 
@@ -57,6 +58,21 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignIn() {
     const [once, setOnce] = React.useState(true);
+    let context = useAppContext();
+    const classes = useStyles();
+    let router = useRouter();
+
+    let passwordLabel = router.locale === 'en-US' ? 'Password' : 'Senha';
+    let repeatPasswordLabel = router.locale === 'en-US' ? 'Repeat Password' : 'Repetir a Senha';
+    let signinLabel = router.locale === 'en-US' ? 'Already have an account? Sign Ip' : 'Já tem uma conta? Entrar agora!';
+    let nameLabel = router.locale === 'en-US' ? 'Name' : 'Nome';
+    let signup = router.locale === 'en-US' ? 'Sign Up' : 'Cadastrar';
+
+    let [email, setEmail] = useState('');
+    let [name, setName] = useState('');
+    let [password, setPassword] = useState('');
+    let [repeatPassword, setRepeatPassword] = useState('');
+    let [birthdate, setBirthdate] = useState('');
 
     useEffect(() => { //Erases the localStorage
         if(once){
@@ -66,22 +82,6 @@ export default function SignIn() {
         }
 
     });
-    const classes = useStyles();
-
-    let router = useRouter();
-
-    let passwordLabel = router.locale === 'en-US' ? 'Password' : 'Senha';
-    let repeatPasswordLabel = router.locale === 'en-US' ? 'Repeat Password' : 'Repetir a Senha';
-    let signinLabel = router.locale === 'en-US' ? 'Already have an account? Sign Ip' : 'Já tem uma conta? Entrar agora!';
-    let nameLabel = router.locale === 'en-US' ? 'Name' : 'Nome';
-    let signup = router.locale === 'en-US' ? 'Sign Up' : 'Cadastrar';
-
-
-    let [email, setEmail] = useState('');
-    let [name, setName] = useState('');
-    let [password, setPassword] = useState('');
-    let [repeatPassword, setRepeatPassword] = useState('');
-    let [birthdate, setBirthdate] = useState('');
 
     function validateEmail(givenEmail) {
         const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -89,6 +89,7 @@ export default function SignIn() {
     }
 
     function handleSignUp(event){
+        //Validates the user data
         event.preventDefault();
         if(password !== repeatPassword) {
             alert('Passwords do not Match!')
@@ -99,18 +100,18 @@ export default function SignIn() {
         else if(!validateEmail(email)) {
             alert('Invalid Email!')
         } else {
+
+            //Stores the user data if it is valid
             let user = {name: name, email: email, password: md5(password), birthdate: birthdate};
             axios.post(DATABASE_URL + CLIENTS+ '/signup', user).then( res => {
                 if(res.data === 'Email taken'){
                     alert('Email Taken!')
                 } else {
                     router.push(router.locale+'/');
-
                 }
             })
         }
     }
-
 
     return (
         <Container component="main" maxWidth="xs">
@@ -193,11 +194,6 @@ export default function SignIn() {
                         {signup}
                     </Button>
                     <Grid container>
-                        {/*<Grid item xs>*/}
-                        {/*    <Link href="#" variant="body2">*/}
-                        {/*        Forgot password?*/}
-                        {/*    </Link>*/}
-                        {/*</Grid>*/}
                         <Grid item>
                             <Link href={router.locale+'/'} variant="body2">
                                 {signinLabel}

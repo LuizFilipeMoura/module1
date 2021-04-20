@@ -56,9 +56,8 @@ const useStyles = makeStyles((theme) => ({
 export default function SignIn() {
 
     const [once, setOnce] = React.useState(true);
-
     const classes = useStyles();
-
+    let context = useAppContext();
     const router = useRouter();
 
     let passwordLabel = router.locale === 'en-US' ? 'Password' : 'Senha';
@@ -68,28 +67,30 @@ export default function SignIn() {
     let [email, setEmail] = useState('');
     let [password, setPassword] = useState('');
 
-    let context = useAppContext();
-
     useEffect(() => { //Erases the localStorage
         if(once){
             localStorage.clear();
             context.loggout();
             setOnce(false);
         }
-        console.log('BBBBBBBBBBBBBBBBBBBB');
-
+        if(localStorage.getItem('wallet')){
+            localStorage.clear();
+        }
     });
 
+    //Signs the user in and store their info in localstorage
     function handleSignIn(event){
         event.preventDefault();
-
         let credentials = { email: email, password: md5(password)};
         axios.post(DATABASE_URL + CLIENTS+ '/signin', credentials).then( res => {
+
+            //Validates the credentials
             if(res.data === 'Email wrong'){
                 alert('Wrong Email Address!')
             } else if(res.data === 'Password wrong'){
                 alert('Wrong Password')
             } else {
+
                 localStorage.setItem('client', JSON.stringify(res.data));
                 localStorage.setItem('isLogged', 'true');
                 context.client = res.data;
@@ -113,7 +114,7 @@ export default function SignIn() {
                 </Typography>
                 <form className={classes.form} onSubmit={handleSignIn}>
                     <TextField
-                        variant="outlined"
+                        variant="filled"
                         margin="normal"
                         required
                         fullWidth
@@ -125,7 +126,7 @@ export default function SignIn() {
                         autoFocus
                     />
                     <TextField
-                        variant="outlined"
+                        variant="filled"
                         margin="normal"
                         required
                         fullWidth
@@ -136,10 +137,6 @@ export default function SignIn() {
                         id="password"
                         autoComplete="current-password"
                     />
-                    {/*<FormControlLabel*/}
-                    {/*    control={<Checkbox value="remember" color="primary" />}*/}
-                    {/*    label="Remember me"*/}
-                    {/*/>*/}
                     <Button
                         type="submit"
                         fullWidth

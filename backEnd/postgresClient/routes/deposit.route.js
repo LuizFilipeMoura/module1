@@ -6,27 +6,23 @@ const q = require('../index');
 const deposit_controller = require('../controllers/depositController');
 
 //REST routing.
-// PUT stores the new trade and
+// PUT stores the deposit and
 // POST list all of them
 router.post('/', (req, res, next) => {
+    //Pushes promise into the queue, when it is resolved the user receives the data
     q.push(function () { //Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
             const result = deposit_controller.post(req, res, next);
-            if(result === undefined){
-                reject(result)
-            }
             resolve(result)
         })
     });
 });
-//Add a new PastTrade to the DB
+//Add a new Deposit to the DB
 router.put('/', (req, res, next) => {
+    //Pushes promise into the queue, when it is resolved the user receives the data
     q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
             const result = deposit_controller.put(req, res, next)
-            if(result === undefined){
-                reject(result)
-            }
             resolve(result)
         })
     });

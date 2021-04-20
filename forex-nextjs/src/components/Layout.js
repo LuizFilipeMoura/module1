@@ -6,6 +6,7 @@ const Layout = ({children}) =>{
     let context = useAppContext();
     return(
         <div>
+            {/*Sets the navbar for all the pages*/}
             <Navbar currencies={context.currencies} wallet={context.wallet} client={context.client}/>
                 {children}
         </div>

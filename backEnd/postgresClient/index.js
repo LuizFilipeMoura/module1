@@ -4,7 +4,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 let queue = require('queue');
 
+//Starts the queue
 let q = queue({ results: [], autostart: true });
+//Export the queue
 module.exports = q;
 
 // Import Routes
@@ -17,7 +19,6 @@ const deposits = require('./routes/deposit.route');
 const app = express();
 app.use(cors());
 
-
 // Body Parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -28,8 +29,6 @@ app.use('/wallets', wallets);
 app.use('/clients', clients);
 app.use('/withdraws', withdraws);
 app.use('/deposits', deposits);
-
-
 
 //Opens server
 let port = 8000;

@@ -27,10 +27,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default function History (){
     let context = useAppContext();
+    const classes = useStyles();
     let [trades, setTrades] = useState();
     let [btnValue, setBtnValue] = useState();
-
     let router = useRouter();
+    const [open, setOpen] = React.useState(false);
 
     let dataLabel = router.locale === 'en-US' ? 'Date' : 'Data';
     let buyingLabel = router.locale === 'en-US' ? 'Buying' : 'Comprando';
@@ -42,7 +43,7 @@ export default function History (){
 
 
 
-    useEffect(() => { //Stores the user in the localstorage
+    useEffect(() => {
         if(!trades || trades.length ===0){
             listTrades();
         }
@@ -63,7 +64,7 @@ export default function History (){
     }
 
     function makesDelete(){
-        console.log('deletou '+ btnValue);
+        //Deletes the history for that trade
         axios.delete(DATABASE_URL + PASTTRADES, {data: {id: btnValue}})
             .then(response => {
                 handleClose();
@@ -73,9 +74,6 @@ export default function History (){
                 console.log("oppps", err);
             });
     }
-
-    const classes = useStyles();
-    const [open, setOpen] = React.useState(false);
 
     const handleOpen = (event) => {
         setBtnValue(event.currentTarget.value);
