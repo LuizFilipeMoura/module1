@@ -51,8 +51,8 @@ export default function Withdraw() {
     let currencyLabel = router.locale === 'en-US' ? 'Currency' : 'Moeda';
     let amountLabel = router.locale === 'en-US' ? 'Amount' : 'Montante';
     let saveLabel = router.locale === 'en-US' ? 'Request Withdraw' : 'Requerir Saque';
-    let withdrawInstructionsLabel = router.locale === 'en-US' ? 'The withdraw will be done in this following account:'
-        : 'O saque será feito na seguinte conta:';
+    let withdrawInstructionsLabel = router.locale === 'en-US' ? 'The deposit will be done in this following account:'
+        : 'O depósito será feito na seguinte conta:';
     let withdrawLabel = router.locale === 'en-US' ? 'Withdraw' : 'Saque';
     let dateLabel = router.locale === 'en-US' ? 'Date' : 'Data';
     let bankInfoAlert = router.locale === 'en-US' ? 'Bank info are not correct' : 'Informações bancárias insuficientes';
@@ -64,7 +64,7 @@ export default function Withdraw() {
 
 
     let [showAlert, setAlert] = React.useState('');
-    let [currency, setCurrency] = useState('');
+    let [currency, setCurrency] = useState(context.currencies[0][0]);
     let [amount, setAmount] = useState(0);
     let [withdraws, setWithdraws] = useState();
 

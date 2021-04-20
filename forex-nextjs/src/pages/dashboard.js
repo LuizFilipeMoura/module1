@@ -47,6 +47,8 @@ export default function Dashboard() {
 
     let [buyingCurrency, setBuyingCurrency] = React.useState(currencies[0][0]);
     let [sellingCurrency, setSellingCurrency] = React.useState(currencies[1][0]);
+    let [buyingSymbolCurrency, setBuyingSymbolCurrency] = React.useState(currencies[0][1]);
+    let [sellingSymbolCurrency, setSellingSymbolCurrency] = React.useState(currencies[1][1]);
     let [buyingAmount, setBuyingAmount] = React.useState(0.00);
     let [sellingAmount, setSellingAmount] = React.useState(0.00);
 
@@ -244,7 +246,7 @@ export default function Dashboard() {
                             <CurrencyTextField
                                 value={index === 0? buyingAmount: sellingAmount}
                                 variant="filled"
-                                currencySymbol={currency[1]}
+                                currencySymbol={index === 0? buyingCurrencySymbol: sellingCurrencySymbol}
                                 id={index === 0? 'buyingAmountInput': 'sellingAmountInput'}
                                 name="input-name"
                                 placeholder={placeholderLabel}
@@ -268,6 +270,7 @@ export default function Dashboard() {
                                     onChange={(event)=>{
                                         if(event.target.value !== 'USD' && sellingCurrency !=='USD'){
                                             setSellingCurrency('USD');
+                                            setSellingCurrency('$');
                                         }
                                         setBuyingCurrency(event.target.value);
                                         setBuyingAmount(0);

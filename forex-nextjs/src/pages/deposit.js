@@ -52,7 +52,7 @@ export default function Deposit() {
     let saveLabel = router.locale === 'en-US' ? 'Request Deposit' : 'Requerir Depósito';
     let forexAccountLabel = router.locale === 'en-US' ? 'Account:' : 'Conta:';
     let depositInstructionsLabel = router.locale === 'en-US' ? 'The deposit must be done in these following account:'
-        : 'O depóstio deverá ser feito na seguinte conta:';
+        : 'O depósIto deverá ser feito na seguinte conta:';
     let depositLabel = router.locale === 'en-US' ? 'Deposit' : 'Depósito';
     let dateLabel = router.locale === 'en-US' ? 'Date' : 'Data';
     let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';

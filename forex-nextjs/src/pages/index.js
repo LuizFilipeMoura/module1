@@ -63,6 +63,9 @@ export default function SignIn() {
     let passwordLabel = router.locale === 'en-US' ? 'Password' : 'Senha';
     let signupLabel = router.locale === 'en-US' ? 'Don\'t have an account? Sign Up' : 'Não tem uma conta? Criar agora!';
     let signin = router.locale === 'en-US' ? 'Sign in' : 'Entrar';
+    let noEmailLabel = router.locale === 'en-US' ? 'No account for email' : 'Nenhuma conta com esse email';
+    let wrongPasswordLabel = router.locale === 'en-US' ? 'Wrong password' : 'Senha inválida';
+
 
     let [email, setEmail] = useState('');
     let [password, setPassword] = useState('');
@@ -86,9 +89,9 @@ export default function SignIn() {
 
             //Validates the credentials
             if(res.data === 'Email wrong'){
-                alert('Wrong Email Address!')
+                alert(noEmailLabel)
             } else if(res.data === 'Password wrong'){
-                alert('Wrong Password')
+                alert(wrongPasswordLabel)
             } else {
 
                 localStorage.setItem('client', JSON.stringify(res.data));
@@ -147,11 +150,6 @@ export default function SignIn() {
                         {signin}
                     </Button>
                     <Grid container>
-                        {/*<Grid item xs>*/}
-                        {/*    <Link href="#" variant="body2">*/}
-                        {/*        Forgot password?*/}
-                        {/*    </Link>*/}
-                        {/*</Grid>*/}
                         <Grid item>
                             <Link href={router.locale+'/sign-up'} variant="body2">
                                 {signupLabel}

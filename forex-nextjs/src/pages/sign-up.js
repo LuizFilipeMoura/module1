@@ -67,6 +67,11 @@ export default function SignIn() {
     let signinLabel = router.locale === 'en-US' ? 'Already have an account? Sign Ip' : 'Já tem uma conta? Entrar agora!';
     let nameLabel = router.locale === 'en-US' ? 'Name' : 'Nome';
     let signup = router.locale === 'en-US' ? 'Sign Up' : 'Cadastrar';
+    let passwordNotMatchLabel = router.locale === 'en-US' ? 'Password don`t match' : 'Senhas não são estão iguais';
+    let passwordLengthLabel = router.locale === 'en-US' ? 'Password need to be at least 6 characthers long' :
+        'Senhas precisam ter pelo menos 6 caracteres';
+    let invalidEmailLabel = router.locale === 'en-US' ? 'Invalid Email' : 'Email inválido';
+    let emailTakenLabel = router.locale === 'en-US' ? 'Email taken' : 'Email indisponível';
 
     let [email, setEmail] = useState('');
     let [name, setName] = useState('');
@@ -92,20 +97,20 @@ export default function SignIn() {
         //Validates the user data
         event.preventDefault();
         if(password !== repeatPassword) {
-            alert('Passwords do not Match!')
+            alert(passwordNotMatchLabel)
         }
         else if(password.length < 6){
-            alert('Passwords need to be minimum 6 charactheres long')
+            alert(passwordLengthLabel)
         }
         else if(!validateEmail(email)) {
-            alert('Invalid Email!')
+            alert(invalidEmailLabel)
         } else {
 
             //Stores the user data if it is valid
             let user = {name: name, email: email, password: md5(password), birthdate: birthdate};
             axios.post(DATABASE_URL + CLIENTS+ '/signup', user).then( res => {
                 if(res.data === 'Email taken'){
-                    alert('Email Taken!')
+                    alert(emailTakenLabel)
                 } else {
                     router.push(router.locale+'/');
                 }
