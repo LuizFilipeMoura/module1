@@ -5,7 +5,6 @@ import React, {useEffect} from "react";
 import {useAppContext} from "../shared/AppWrapper";
 
 import {makeStyles} from "@material-ui/core/styles";;
-import {useRouter} from "next/router";
 
 const useStyles = makeStyles({//Define the style of the page
     list: {
@@ -68,3 +67,4 @@ const Navbar = ({currencies, wallet, client}) => {
 
 };
 export default Navbar;
+

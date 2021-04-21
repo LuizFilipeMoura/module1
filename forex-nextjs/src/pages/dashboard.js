@@ -80,29 +80,14 @@ export default function Dashboard() {
             router.push(router.locale+'/')
         }
         //Adjust the symbol
-        if(sellingCurrency === 'EUR'){
-            setSellingSymbol('€');
-        }
-        if(sellingCurrency === 'BRL'){
-            setSellingSymbol('R$');
-        }
-        if(sellingCurrency === 'GBP'){
-            setSellingSymbol('£');
-        }
-        if(sellingCurrency === 'USD'){
-            setSellingSymbol('$');
-        }
-        if(buyingCurrency === 'EUR'){
-            setBuyingSymbol('€');
-        }
-        if(buyingCurrency === 'BRL'){
-            setBuyingSymbol('R$');
-        }
-        if(buyingCurrency === 'GBP'){
-            setBuyingSymbol('£');
-        }
-        if(buyingCurrency === 'USD'){
-            setBuyingSymbol('$');
+
+        for(const currency of context.currencies){
+            if(currency[0] === buyingCurrency){
+                setBuyingSymbol(currency[1])
+            }
+            if(currency[0] === sellingCurrency){
+                setSellingSymbol(currency[1])
+            }
         }
     });
 
@@ -259,14 +244,15 @@ export default function Dashboard() {
                 }
             </div>
             {[currencies[0], currencies[1]].map((currency, index) => (
-                <>
-                    <div className="m-2 d-flex justify-content-center align-items-center " key={index}>
-                        <div >
-                            <h3>{operationLabel[index]}</h3>
+                <div key={index + 'divContainer'}>
+                    <div className="m-2 d-flex justify-content-center align-items-center " key={index + 'divHeader'}>
+                        <div key={index + 'div'}>
+                            <h3 key={index + 'h3'}>{operationLabel[index]}</h3>
                         </div>
 
-                        <div className="m-2">
+                        <div className="m-2" key={index + 'div3'}>
                             <CurrencyTextField
+                                key={index + 'currencyInput'}
                                 value={index === 0? buyingAmount: sellingAmount}
                                 variant="filled"
                                 currencySymbol={index === 0? buyingSymbol: sellingSymbol}
@@ -288,6 +274,7 @@ export default function Dashboard() {
                             index===0 ? //If it is a buying amount input
 
                                 <Select
+                                    key={index + 'select'}
                                     value={buyingCurrency}
                                     variant="filled"
                                     onChange={(event)=>{
@@ -301,7 +288,7 @@ export default function Dashboard() {
                                     }}>
                                     {currencies.map((currencyToSelect, index) =>
                                         !(currencyToSelect[0] === sellingCurrency) ?
-                                            <MenuItem value={currencyToSelect[0]} style={{backgroundColor: '#6d2177'}} key={index}>
+                                            <MenuItem value={currencyToSelect[0]} style={{backgroundColor: '#6d2177'}} key={index+'MenuItem'}>
                                                 {currencyToSelect[2].toUpperCase()}
                                             </MenuItem>
                                             :''
@@ -310,6 +297,7 @@ export default function Dashboard() {
                                 </Select>
                                 ://If it is a selling amount input
                                 <Select
+                                    key={index + 'select2'}
                                     value={sellingCurrency}
                                     variant="filled"
                                     onChange={(event)=>{
@@ -323,7 +311,7 @@ export default function Dashboard() {
                                     }}>
                                     {currencies.map((currencyToSelect, index) =>
                                         !(currencyToSelect[0] === buyingCurrency) ?
-                                            <MenuItem value={currencyToSelect[0]} style={{backgroundColor: '#6d2177'}}>
+                                            <MenuItem value={currencyToSelect[0]} style={{backgroundColor: '#6d2177'}} key={index + 'MenuItem2'}>
                                                 {currencyToSelect[2].toUpperCase()}
                                             </MenuItem>
                                             :''
@@ -332,13 +320,13 @@ export default function Dashboard() {
                         }
 
                     </div>
-                </>
+                </div>
             ))}
 
 
 
 
-            {/*  The bottom text where the calculations happen to give the value of the transaction to the client   */}
+              {/*The bottom text where the calculations happen to give the value of the transaction to the client*/}
             <div className="m-2 d-flex justify-content-center align-items-center ">
 
                 <h5>{buyingAmount.toFixed(2)} {buyingCurrency} {equalsToLabel}</h5>

@@ -2,7 +2,7 @@ import React, {createContext, useContext, useState} from 'react';
 import axios from "axios";
 import {DATABASE_URL, WALLETS} from "./enviroment";
 
-const AppContext = createContext({
+export const AppContext = createContext({
 });
 
 export function AppWrapper({ children }) {

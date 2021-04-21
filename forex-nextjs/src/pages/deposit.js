@@ -17,6 +17,7 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
+import {number} from "prop-types";
 
 
 const {useState} = require("react");
@@ -91,11 +92,12 @@ export default function Deposit() {
         let request = {id: context.client.id, currency, amount, status: 'PENDING'};
 
         //Stores it in the database, The DB automatically adds the amount from the wallet when it is DONE
-
-        axios.put(DATABASE_URL + DEPOSITS, request).then( res => {
-            sucessful();
-            listDeposits();
-        })
+        if(!Number(amount)){
+            axios.put(DATABASE_URL + DEPOSITS, request).then( res => {
+                sucessful();
+                listDeposits();
+            })
+        }
     }
 
     function sucessful(){

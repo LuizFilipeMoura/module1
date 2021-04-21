@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Index() {
+export default function SendMoney() {
     let context = useAppContext();
 
     const classes = useStyles();
@@ -78,7 +78,7 @@ export default function Index() {
     let failTransactionLabel = router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ';
     let cancelLabel = router.locale === 'en-US' ? 'Cancel' : 'Cancelar';
 
-    let [clients, setClients] = useState('');
+    let [clients, setClients] = useState([]);
     let [clientReceiver, setClientReceiver] = useState();
     let [currency, setCurrency] = useState('USD');
     let [amount, setAmount] = useState(0);
@@ -89,12 +89,12 @@ export default function Index() {
     useEffect(() => {
 
         //List all the users
-        if (clients === ''){
+        if (clients.length === 0){
             listClients();
         }
 
         //If there is information in the router query it is applied to the form
-        if(Object.entries(router.query).length !== 0){
+        if(router.query && Object.entries(router.query).length !== 0){
             for(const client of clients){
                 if(Number(router.query.receiver_id ) === client.id){
                     setClientReceiver(client);

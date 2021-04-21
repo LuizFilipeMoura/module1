@@ -116,8 +116,9 @@ export default function Withdraw() {
             rejectTransaction()
         }else if(currency === 'GBP' && amount > context.wallet.poundamount){
             rejectTransaction()
-        } else{
-
+        } else if (!Number(amount)){
+            rejectTransaction();
+        } else {
             //If the user can afford the withdraw, stores it in the database, The DB automatically subtracts the amount from the wallet
             axios.put(DATABASE_URL + WITHDRAWS, request).then( res => {
                 sucessfulTransaction();
@@ -175,6 +176,7 @@ export default function Withdraw() {
                         label={amountLabel}
                         defaultValue={0.00}
                         fullWidth
+                        required
                         decimalsLimit={2}
                         decimalCharacter="."
                         digitGroupSeparator=""
