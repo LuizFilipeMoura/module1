@@ -49,6 +49,8 @@ export default function SignIn() {
     let profileLabel = router.locale === 'en-US' ? 'Profile' : 'Perfil';
     let saveLabel = router.locale === 'en-US' ? 'Save' : 'Salvar';
     let successTransactionLabel = router.locale === 'en-US' ? '✓ Profile saved' : '✓ Perfil salvo!';
+    let emailTakenLabel = router.locale === 'en-US' ? 'Email taken' : 'Email indisponível';
+    let invalidEmailLabel = router.locale === 'en-US' ? 'Invalid Email' : 'Email inválido';
 
     let [showAlert, setAlert] = React.useState('');
     let [email, setEmail] = useState('');
@@ -61,7 +63,6 @@ export default function SignIn() {
         if (email === '' && name ==='' && context.client){
             setEmail(context.client.email);
             setName(context.client.name);
-            console.log(context.client);
             setBirthdate(context.client.birthdate);
         }
         if(!context.isLogged && !localStorage.getItem('isLogged')){
@@ -78,24 +79,35 @@ export default function SignIn() {
 
         //Validates the user data
         event.preventDefault();
-        if(!validateEmail(email)) {
-            alert('Invalid Email!')
-        } else {
 
-            //Stores the user data if it is valid
-            let user = {id: context.client.id,
-                name,
-                email,
-                birthdate,
-                bank_number: context.client.bank_number,
-                account_number: context.client.account_number};
-            context.client = user;
-            context.updateContext(context);
-            localStorage.setItem('client', JSON.stringify(user));
-            axios.put(DATABASE_URL + CLIENTS, user).then( res => {
-                sucessful();
-            })
-        }
+        let user = {name: name, email: email, password: 'invalid', birthdate: birthdate};
+
+        //If the email is taken
+        axios.post(DATABASE_URL + CLIENTS+ '/signup', user).then( res => {
+            if(res.data === 'Email taken'){
+                alert(emailTakenLabel)
+            } else {
+                if(!validateEmail(email)) {
+                    alert(invalidEmailLabel)
+                } else {
+
+                    //Stores the user data if it is valid
+                    let user = {id: context.client.id,
+                        name,
+                        email,
+                        birthdate,
+                        bank_number: context.client.bank_number,
+                        account_number: context.client.account_number};
+                    context.client = user;
+                    context.updateContext(context);
+                    localStorage.setItem('client', JSON.stringify(user));
+                    axios.put(DATABASE_URL + CLIENTS, user).then( res => {
+                        sucessful();
+                    })
+                }
+            }
+        })
+
     }
 
     function sucessful(){

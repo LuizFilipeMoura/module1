@@ -83,8 +83,10 @@ export default function SignIn() {
 
     //Signs the user in and store their info in localstorage
     function handleSignIn(event){
+
         event.preventDefault();
         let credentials = { email: email, password: md5(password)};
+
         axios.post(DATABASE_URL + CLIENTS+ '/signin', credentials).then( res => {
 
             //Validates the credentials
@@ -93,7 +95,6 @@ export default function SignIn() {
             } else if(res.data === 'Password wrong'){
                 alert(wrongPasswordLabel)
             } else {
-
                 localStorage.setItem('client', JSON.stringify(res.data));
                 localStorage.setItem('isLogged', 'true');
                 context.client = res.data;
@@ -151,7 +152,7 @@ export default function SignIn() {
                     </Button>
                     <Grid container>
                         <Grid item>
-                            <Link href={router.locale+'/sign-up'} variant="body2">
+                            <Link href={router.locale+'/signUp'} variant="body2">
                                 {signupLabel}
                             </Link>
                         </Grid>

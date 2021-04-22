@@ -1,5 +1,5 @@
 import React from "react";
-import SignUp from "../pages/sign-up";
+import SignUp from "../pages/signUp";
 import { screen} from "@testing-library/react";
 import RouterMock, {customRender} from "./test-utils";
 

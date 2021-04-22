@@ -4,7 +4,7 @@ import DrawerList from "./Drawer";
 import React, {useEffect} from "react";
 import {useAppContext} from "../shared/AppWrapper";
 
-import {makeStyles} from "@material-ui/core/styles";;
+import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles({//Define the style of the page
     list: {

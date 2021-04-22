@@ -1,5 +1,5 @@
 import React from "react";
-import BankInfo from "../pages/bank-info";
+import BankInfo from "../pages/bankInfo";
 import { screen} from "@testing-library/react";
 import RouterMock, {customRender} from "./test-utils";
 

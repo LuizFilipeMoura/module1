@@ -3,7 +3,6 @@ import React, {useEffect} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -13,9 +12,9 @@ import {useAppContext} from "../shared/AppWrapper";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-const {useState} = require("react");
 import QRCode from "react-qr-code";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
+const {useState} = require("react");
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -123,6 +122,8 @@ export default function SendMoney() {
                         {chargeLabel}!
                     </Button>
                 </form>
+
+                {/*Shows the link and the QRCode*/}
 
                 {link ?
                 <span>

@@ -40,6 +40,7 @@ export default function History (){
         : 'Voce tem certeza que quer deletar essa transação do seu histórico?';
     let yesLabel = router.locale === 'en-US' ? 'Yes' : 'Sim';
     let cancelLabel = router.locale === 'en-US' ? 'Cancel' : 'Cancelar';
+    let historyLabel= router.locale === 'en-US' ? 'History' : 'Histórico';
 
 
 
@@ -56,7 +57,7 @@ export default function History (){
 
         axios.post(DATABASE_URL + PASTTRADES, context.client)
             .then(response => {
-                setTrades(response.data.rows);
+                setTrades( response.data.rows.length === 0 ? [] : response.data.rows);
             })
             .catch(err => {
                 console.log("oppps", err);
@@ -109,11 +110,12 @@ export default function History (){
                 </Modal>
             </div>
 
-            <div >
+            <div className="text-center align-center ">
+                <h3>{historyLabel}</h3>
+
                 <table className="table table-light">
                     <thead>
                     <tr>
-                        <th scope="col">#</th>
                         <th scope="col">{dataLabel}</th>
                         <th scope="col">{buyingLabel}</th>
                         <th scope="col">{sellingLabel}</th>
@@ -127,10 +129,9 @@ export default function History (){
                     { trades?.map( (trade,index) =>
 
                         <tr key={index}>
-                            <th scope="row">{index}</th>
-                            <td>{(new Date(trade.date)).toLocaleDateString() + ' '+ (new Date(trade.date)).getHours() + ':' +
+                            <th scope="row">{(new Date(trade.date)).toLocaleDateString() + ' '+ (new Date(trade.date)).getHours() + ':' +
                             ((new Date(trade.date)).getUTCMinutes() <= 9? '0' + (new Date(trade.date)).getUTCMinutes(): (new Date(trade.date)).getUTCMinutes() ) }
-                            </td>
+                            </th>
                             <td>
                                 <span className="text-muted">{trade.from_currency}</span>
                                 <span style={{fontSize: '18px'}}>{trade.from_amount.toFixed(2)}</span>

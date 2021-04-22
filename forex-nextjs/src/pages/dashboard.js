@@ -323,9 +323,6 @@ export default function Dashboard() {
                 </div>
             ))}
 
-
-
-
               {/*The bottom text where the calculations happen to give the value of the transaction to the client*/}
             <div className="m-2 d-flex justify-content-center align-items-center ">
 
@@ -358,8 +355,6 @@ export default function Dashboard() {
                 <div className="m-2 row">
                     <h1>{dashboardLabel}</h1>
                 </div>
-
-
 
                 {/*Currencies dashboard*/}
                 <div className="h-100 d-flex justify-content-center align-items-center container">
