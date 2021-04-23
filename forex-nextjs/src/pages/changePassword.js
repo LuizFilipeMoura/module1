@@ -6,8 +6,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import axios from "axios";
 import 'date-fns';
-
-import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -15,7 +13,7 @@ import Container from '@material-ui/core/Container';
 import {useRouter} from "next/router";
 import {CLIENTS, DATABASE_URL} from "../shared/enviroment";
 import {useAppContext} from "../shared/AppWrapper";
-import Link from "@material-ui/core/Link";
+const md5 = require('md5');
 
 
 const {useState} = require("react");
@@ -41,76 +39,63 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Profile() {
+export default function ChangePassword() {
     let context = useAppContext();
     const classes = useStyles();
     let router = useRouter();
 
-    let nameLabel = router.locale === 'en-US' ? 'Name' : 'Nome';
-    let profileLabel = router.locale === 'en-US' ? 'Profile' : 'Perfil';
+    let passwordLabel = router.locale === 'en-US' ? 'New Password' : 'Nova Senha';
+    let repeatPasswordLabel = router.locale === 'en-US' ? 'Repeat new Password' : 'Repetir a nova Senha';
+    let changePasswordLabel = router.locale === 'en-US' ? 'Change Password' : 'Mudar Senha';
     let saveLabel = router.locale === 'en-US' ? 'Save' : 'Salvar';
     let successTransactionLabel = router.locale === 'en-US' ? '✓ Profile saved' : '✓ Perfil salvo!';
-    let emailTakenLabel = router.locale === 'en-US' ? 'Email taken' : 'Email indisponível';
-    let invalidEmailLabel = router.locale === 'en-US' ? 'Invalid Email' : 'Email inválido';
-    let changePasswordLabel = router.locale === 'en-US' ? 'Change Password' : 'Mudar Senha';
-    let birthdateLabel = router.locale === 'en-US' ? 'Birthdate' : 'Data de nascimento';
-
+    let oldPasswordLabel = router.locale === 'en-US' ? 'Old Password' : 'Senha antiga';
+    let wrongPasswordLabel = router.locale === 'en-US' ? 'Wrong password' : 'Senha inválida';
+    let passwordNotMatchLabel = router.locale === 'en-US' ? 'Password don`t match' : 'Senhas não são estão iguais';
+    let passwordLengthLabel = router.locale === 'en-US' ? 'Password need to be at least 6 characthers long' :
+        'Senhas precisam ter pelo menos 6 caracteres';
 
     let [showAlert, setAlert] = React.useState('');
-    let [email, setEmail] = useState('');
-    let [name, setName] = useState('');
-    let [birthdate, setBirthdate] = useState('');
+    let [oldPassword, setOldPassword] = useState('');
+    let [password, setPassword] = useState('');
+    let [repeatPassword, setRepeatPassword] = useState('');
 
     useEffect(() => {
-        //If the user has valid data, show it here
-
-        if (email === '' && name ==='' && context.client){
-            setEmail(context.client.email);
-            setName(context.client.name);
-            setBirthdate(context.client.birthdate);
-        }
         if(!context.isLogged && !localStorage.getItem('isLogged')){
             router.push(router.locale+'/')
         }
     });
 
-    function validateEmail(givenEmail) {
-        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(String(givenEmail).toLowerCase());
-    }
-
-    function handleProfileChanging(event){
+    function handlePasswordChanging(event){
 
         //Validates the user data
         event.preventDefault();
 
-        let user = {name: name, email: email, password: 'invalid', birthdate: birthdate};
+        if(password !== repeatPassword) {
+            alert(passwordNotMatchLabel)
+        }
+        else if(password.length < 6) {
+            alert(passwordLengthLabel)
+        } else {
+            let credentials = {email: context.client.email, password: md5(oldPassword)};
+            axios.post(DATABASE_URL + CLIENTS+ '/signin', credentials).then( res => {
 
-        //If the email is taken
-        axios.post(DATABASE_URL + CLIENTS+ '/signup', user).then( res => {
-            if(res.data === 'Email taken'){
-                alert(emailTakenLabel)
-            } else {
-                if(!validateEmail(email)) {
-                    alert(invalidEmailLabel)
+                //Validates the credentials
+                if(res.data === 'Password wrong'){
+                    alert(wrongPasswordLabel)
                 } else {
-
-                    //Stores the user data if it is valid
-                    let user = {id: context.client.id,
-                        name,
-                        email,
-                        birthdate,
-                        bank_number: context.client.bank_number,
-                        account_number: context.client.account_number};
-                    context.client = user;
-                    context.updateContext(context);
-                    localStorage.setItem('client', JSON.stringify(user));
-                    axios.put(DATABASE_URL + CLIENTS, user).then( res => {
+                    //Changes the password
+                    let user = {id: context.client.id, password: md5(password)};
+                    console.log(user);
+                    axios.put(DATABASE_URL + CLIENTS+ '/changepassword', user).then( res => {
+                        console.log(res);
                         sucessful();
                     })
                 }
-            }
-        })
+            })
+        }
+
+
 
     }
 
@@ -136,51 +121,43 @@ export default function Profile() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {profileLabel}
+                    {changePasswordLabel}
                 </Typography>
-                <form className={classes.form} onSubmit={handleProfileChanging}>
+                <form className={classes.form} onSubmit={handlePasswordChanging}>
                     <TextField
                         variant="outlined"
                         margin="normal"
                         required
                         fullWidth
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                        id="name"
-                        label={nameLabel}
-                        name="name"
-                        autoComplete="name"
-                        autoFocus
-                        required
+                        name="password"
+                        onChange={(event) => setOldPassword(event.target.value)}
+                        label={oldPasswordLabel}
+                        type="password"
+                        id="password"
                     />
                     <TextField
                         variant="outlined"
                         margin="normal"
                         required
                         fullWidth
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                        id="email"
-                        label="Email"
-                        name="email"
-                        autoComplete="email"
-                        autoFocus
-                        required
+                        name="password"
+                        onChange={(event) => setPassword(event.target.value)}
+                        label={passwordLabel}
+                        type="password"
+                        id="newPassword"
+                        autoComplete="current-password"
                     />
-
                     <TextField
                         variant="outlined"
                         margin="normal"
                         required
                         fullWidth
-                        id="birthdate"
-                        value={birthdate}
-                        label={birthdateLabel}
-                        name="birthdate"
-                        autoComplete="birthdate"
-                        onChange={(event) => setBirthdate(event.target.value)}
-                        type="date"
-                        required
+                        name="password"
+                        onChange={(event) => setRepeatPassword(event.target.value)}
+                        label={repeatPasswordLabel}
+                        type="password"
+                        id="repeatPassword"
+                        autoComplete="current-password"
                     />
                     <Button
                         type="submit"
@@ -192,7 +169,6 @@ export default function Profile() {
                         {saveLabel}
                     </Button>
                 </form>
-                <Link href={ '/' +router.locale+ '/changePassword'} style={{color: '#FFF'}}>{changePasswordLabel}</Link>
             </div>
         </Container>
     );

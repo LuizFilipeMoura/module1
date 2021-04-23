@@ -8,7 +8,7 @@ oxr.set({ app_id: 'fefd1e002fa444cba0ca8a211cde33a3' });
 //Open the server
 const wss = new WebSocket.Server({ port: 8001 });
 console.log("Server open in port 8001");
-let infoBundle = {};
+let infoBundle = {} = { usdTOgbp: 0.728646, usdTOeur: 0.840607, usdTObrl: 5.733826 };
 
 //Handles the connection to the websocket, calls the schedueler caller of the API
 wss.on('connection', function connection(ws) {
@@ -16,7 +16,7 @@ wss.on('connection', function connection(ws) {
     console.log('Conected');
 
     if(ws){
-        getLastest();
+        // getLastest();
         ws.send(JSON.stringify(infoBundle));
     }
 
@@ -35,7 +35,7 @@ let schedueler = function(ws) {
     setInterval(function(){
 
         if(ws){
-            getLastest();
+            // getLastest();
             ws.send(JSON.stringify(infoBundle));
         }
 

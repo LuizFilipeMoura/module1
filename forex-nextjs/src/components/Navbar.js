@@ -40,13 +40,14 @@ const Navbar = ({currencies, wallet, client}) => {
 
     //If the wallet exists, show it to the user
     if(wallet && Object.entries(wallet).length !== 0) //Shows the navbar just when there are values inside the wallet
-        return(
+
+    return(
             <div className="m-2 row ">
                 {}
                 <React.Fragment >
                     <Button onClick={toggleDrawer('right', true)}>{client?.name}</Button>
                     <Drawer anchor='right' open={state['right']} onClose={toggleDrawer('right', false)} classes={{paper: classes.paper}}>
-                        <DrawerList props={state['right']} />
+                        <DrawerList />
                     </Drawer>
                 </React.Fragment>
 

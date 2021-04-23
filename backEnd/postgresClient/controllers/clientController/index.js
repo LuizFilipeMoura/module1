@@ -50,15 +50,14 @@ async function signUp(req, res, next){
 
 //Updates the values of the client
 async function put(req, res, next){
-    console.log(req.body);
-        const sql = 'UPDATE clients set name = $1, email = $2, birthdate =$3, bank_number =$4, account_number = $5 where id = $6';
+    const sql = 'UPDATE clients set name = $1, email = $2, birthdate =$3, bank_number =$4, account_number = $5 where id = $6';
 
-        const values = [ req.body.name, req.body.email, req.body.birthdate, req.body.bank_number, req.body.account_number, req.body.id ]; //Query Values
-        const client =  (await connect);
+    const values = [ req.body.name, req.body.email, req.body.birthdate, req.body.bank_number, req.body.account_number, req.body.id ]; //Query Values
+    const client =  (await connect);
 
-        await client.query(sql, values); //Executes the query
-        console.log('success');
-        res.send('success');
+    await client.query(sql, values); //Executes the query
+    console.log('success');
+    res.send('success');
 }
 
 //Lists the clients for the autocomplete input
@@ -71,4 +70,22 @@ async function get(req, res, next){
     res.send(result.rows);
 }
 
-module.exports = { signIn, signUp, put, get };
+async function changepassword(req, res, next){
+    if(req.body && req.body.id && req.body.password){
+        console.log(req.body);
+        const sql = 'UPDATE clients set password = $1 where id = $2';
+
+        const values = [ req.body.password, req.body.id ]; //Query Values
+        const client =  (await connect);
+
+        await client.query(sql, values); //Executes the query
+        console.log('success');
+        res.send('success');
+    } else {
+        console.log('error! Request Body is not complete');
+        res.send('error! Request Body is not complete');
+    }
+}
+
+
+module.exports = { signIn, signUp, put, get, changepassword };

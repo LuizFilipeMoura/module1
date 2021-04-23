@@ -58,6 +58,8 @@ export default function Deposit() {
     let dateLabel = router.locale === 'en-US' ? 'Date' : 'Data';
     let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
     let nameLabel = router.locale === 'en-US' ? 'Name: ' : 'Nome: ';
+    let doneLabel = router.locale === 'en-US' ? 'DONE' : 'FEITO';
+    let pendingLabel = router.locale === 'en-US' ? 'PENDING' : 'PENDENTE';
 
     let [showAlert, setAlert] = React.useState('');
     let [currency, setCurrency] = useState('');
@@ -196,25 +198,31 @@ export default function Deposit() {
                     <div className="d-flex justify-content-center align-items-center" >
                         {deposit.status === 'DONE'?
                             <div className="alert alert-success w-100" role="alert">
-                                <p>{depositLabel} {deposit.status}</p> <strong>
+                                <p>{depositLabel} {doneLabel}</p> <strong>
                                 <p>{amountLabel}: {deposit.amount}</p>
-                                <p>{currencyLabel}: {deposit.currency}</p>
+                                <p>{deposit.currency}</p>
                             </strong>
                                 <p>{dateLabel}: {(new Date(deposit.date)).toLocaleDateString() + ' '+ (new Date(deposit.date)).getHours() + ':' +
                                 ((new Date(deposit.date)).getUTCMinutes() <= 9? '0' + (new Date(deposit.date)).getUTCMinutes(): (new Date(deposit.date)).getUTCMinutes() ) }</p>
                                 {deposit.obs && deposit.obs !== '' ?
-                                    <p>{currencyLabel}: {deposit.obs}</p>: ''}
+                                    <p> {router.locale === 'en-US' ?  deposit.obs : deposit.obs?.toString()
+                                        .replace('SENT', 'ENVIADO')
+                                        .replace('BY', 'POR')
+                                        .replace('TO', 'PARA')}</p>: ''}
                             </div>
                             :
                             <div className="alert alert-danger w-100" role="alert">
-                                <p>{depositLabel} {deposit.status}</p> <strong>
+                                <p>{depositLabel} {pendingLabel}</p> <strong>
                                 <p>{amountLabel}: {deposit.amount}</p>
                                 <p>{currencyLabel}: {deposit.currency}</p>
                             </strong>
                                 <p>{dateLabel}: {(new Date(deposit.date)).toLocaleDateString() + ' '+ (new Date(deposit.date)).getHours() + ':' +
                                 ((new Date(deposit.date)).getUTCMinutes() <= 9? '0' + (new Date(deposit.date)).getUTCMinutes(): (new Date(deposit.date)).getUTCMinutes() ) }</p>
                                 {deposit.obs && deposit.obs !== '' ?
-                                    <p>{currencyLabel}: {deposit.obs}</p>: ''}
+                                    <p> {router.locale === 'en-US' ?  deposit.obs : deposit.obs?.toString()
+                                        .replace('SENT', 'ENVIADO')
+                                        .replace('BY', 'POR')
+                                        .replace('TO', 'PARA')}</p>: ''}
                             </div>
                         }
 

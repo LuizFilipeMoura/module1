@@ -46,14 +46,6 @@ const DrawerList = ({props}) => {
     let sendMoneyLabel= router.locale === 'en-US' ? 'Send Money' : 'Enviar Dinheiro';
     let chargeMoneyLabel= router.locale === 'en-US' ? 'Charge' : 'Cobrar';
 
-
-    const toggleDrawer = (anchor, open) => (event) => {//Toggles Side Drawer
-        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-            return;
-        }
-        setState({ ...state, [anchor]: open });
-    };
-
     //The list of buttons inside the drawer
     return (
 
@@ -63,17 +55,16 @@ const DrawerList = ({props}) => {
                     [classes.fullList]: 'right' === 'top' || 'right' === 'bottom',
                 })}
                 role="presentation"
-                onClick={toggleDrawer('right', false)}
-                onKeyDown={toggleDrawer('right', false)}
             >
                 <List>
 
+                    {}
                     {/*Go through all the options available inside the drawer*/}
 
                     {[profileLabel, bankInfoLabel, historyLabel, withdrawLabel, depositLabel, dashboardLabel,sendMoneyLabel, chargeMoneyLabel, accountBalanceLabel, logoutLabel].map((text, index) => (
                         <ListItem button key={text} onClick={()=>
 
-                            router.push({ pathname: router.locale +'/' + (index === 0 ? 'profile'
+                            {router.push({ pathname: router.locale +'/' + (index === 0 ? 'profile'
                                 : index === 1 ? 'bank-info'
                                     : index === 2 ? 'history'
                                         : index === 3 ? 'withdraw'
@@ -83,7 +74,8 @@ const DrawerList = ({props}) => {
                                                         : index === 7 ? 'chargeForMoney'
                                                                 : index === 8 ? 'accountBalance'
                                                             : '')
-                            }) }>
+                            });
+                            } }>
                             <ListItemIcon>
                                 {index === 0 ? <AccountCircleIcon />
                                     : index === 1 ? <AccountBalanceIcon />

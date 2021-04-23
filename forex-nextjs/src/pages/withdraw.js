@@ -57,6 +57,8 @@ export default function Withdraw() {
     let dateLabel = router.locale === 'en-US' ? 'Date' : 'Data';
     let bankInfoAlert = router.locale === 'en-US' ? 'Bank info are not correct' : 'Informações bancárias insuficientes';
     let bankNumberLabel = router.locale === 'en-US' ? 'Bank Number' : 'Número do Banco';
+    let doneLabel = router.locale === 'en-US' ? 'DONE' : 'FEITO';
+    let pendingLabel = router.locale === 'en-US' ? 'PENDING' : 'PENDENTE';
     let accountNumberLabel = router.locale === 'en-US' ? 'Account Number' : 'Número da conta';
     let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
     let nameLabel = router.locale === 'en-US' ? 'Name: ' : 'Nome: ';
@@ -220,26 +222,32 @@ export default function Withdraw() {
                     <div className="d-flex justify-content-center align-items-center" >
                         {withdraw.status === 'DONE'?
                             <div className="alert alert-success w-100" role="alert">
-                                <p>{withdrawLabel} {withdraw.status}</p> <strong>
+                                <p>{withdrawLabel} {doneLabel}</p> <strong>
                                 <p>{amountLabel}: {withdraw.amount}</p>
                                 <p>{currencyLabel}: {withdraw.currency}</p>
                             </strong>
                                 <p>{dateLabel}: {(new Date(withdraw.date)).toLocaleDateString() + ' '+ (new Date(withdraw.date)).getHours() + ':' +
                                 ((new Date(withdraw.date)).getUTCMinutes() <= 9? '0' + (new Date(withdraw.date)).getUTCMinutes(): (new Date(withdraw.date)).getUTCMinutes() ) }</p>
                                 {withdraw.obs && withdraw.obs !== '' ?
-                                    <p>{currencyLabel}: {withdraw.obs}</p>: ''}
+                                    <p>{router.locale === 'en-US' ?  withdraw.obs : withdraw.obs?.toString()
+                                        .replace('SENT', 'ENVIADO')
+                                        .replace('BY', 'POR')
+                                        .replace('TO', 'PARA')}</p>: ''}
 
                             </div>
                             :
                             <div className="alert alert-danger w-100" role="alert">
-                                <p>{withdrawLabel} {withdraw.status}</p> <strong>
+                                <p>{withdrawLabel} {pendingLabel}</p> <strong>
                                 <p>{amountLabel}: {withdraw.amount}</p>
-                                <p>{currencyLabel}: {withdraw.currency}</p>
+                                <p>{withdraw.currency}</p>
                             </strong>
                                 <p>{dateLabel}: {(new Date(withdraw.date)).toLocaleDateString() + ' '+ (new Date(withdraw.date)).getHours() + ':' +
                                 ((new Date(withdraw.date)).getUTCMinutes() <= 9? '0' + (new Date(withdraw.date)).getUTCMinutes(): (new Date(withdraw.date)).getUTCMinutes() ) }</p>
                                 {withdraw.obs && withdraw.obs !== '' ?
-                                    <p>{currencyLabel}: {withdraw.obs}</p>: ''}
+                                    <p>{router.locale === 'en-US' ?  withdraw.obs : withdraw.obs?.toString()
+                                        .replace('SENT', 'ENVIADO')
+                                        .replace('BY', 'POR')
+                                        .replace('TO', 'PARA')}</p>: ''}
                             </div>
                         }
 

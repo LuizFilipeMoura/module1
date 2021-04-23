@@ -72,6 +72,7 @@ export default function SignIn() {
         'Senhas precisam ter pelo menos 6 caracteres';
     let invalidEmailLabel = router.locale === 'en-US' ? 'Invalid Email' : 'Email inválido';
     let emailTakenLabel = router.locale === 'en-US' ? 'Email taken' : 'Email indisponível';
+    let birthdateLabel = router.locale === 'en-US' ? 'Birthdate' : 'Data de nascimento';
 
     let [email, setEmail] = useState('');
     let [name, setName] = useState('');
@@ -183,7 +184,7 @@ export default function SignIn() {
                         required
                         fullWidth
                         id="birthdate"
-                        label={birthdate}
+                        label={birthdateLabel}
                         name="birthdate"
                         autoComplete="birthdate"
                         onChange={(event) => setBirthdate(event.target.value)}

@@ -44,8 +44,19 @@ router.put('/', (req, res, next) => {
             resolve(result)
         })
     });
-
 });
+
+//Updates the user
+router.put('/changepassword', (req, res, next) => {
+    //Pushes promise into the queue, when it is resolved the user receives the data
+    q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
+        return new Promise(function (resolve, reject) {
+            const result = client_controller.changepassword(req, res, next);
+            resolve(result)
+        })
+    });
+});
+
 
 //Gets all the names and email of all users
 router.get('/', (req, res, next) => {
