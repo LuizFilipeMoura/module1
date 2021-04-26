@@ -10,8 +10,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {useRouter} from "next/router";
-import {CLIENTS, DATABASE_URL, DEPOSITS, WITHDRAWS} from "../../shared/enviroment";
-import {useAppContext} from "../../shared/AppWrapper";
+import {CLIENTS, DATABASE_URL, DEPOSITS, WITHDRAWS} from "../shared/enviroment";
+import {useAppContext} from "../shared/AppWrapper";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -20,9 +20,9 @@ import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
-import {useLabels} from "../../shared/labels";
-import {calculatesWithWallet, rejectTransactionGlobal, sucessfulTransactionGlobal} from "../../shared/globalFunctions";
-import Alert from "../../components/Alert";
+import {useLabels} from "../shared/labels";
+import {calculatesWithWallet, rejectTransactionGlobal, sucessfulTransactionGlobal} from "../shared/globalFunctions";
+import Alert from "../components/Alert";
 
 
 const {useState} = require("react");
@@ -71,6 +71,7 @@ export default function SendMoney() {
     let router = useRouter();
     let labels = useLabels().labels;
 
+    const [once, setOnce] = React.useState(true);
     let [clients, setClients] = useState([]);
     let [clientReceiver, setClientReceiver] = useState();
     let [currency, setCurrency] = useState('USD');
@@ -82,8 +83,9 @@ export default function SendMoney() {
     useEffect(() => {
 
         //List all the users
-        if (clients.length === 0){
+        if(once && context.client){
             listClients();
+            setOnce(false);
         }
 
         //If there is information in the router query it is applied to the form
@@ -98,6 +100,7 @@ export default function SendMoney() {
             setDisabled(true);
         }
 
+
         //If the user is not logged in it is redirected to the login page
         if(!context.isLogged && !localStorage.getItem('isLogged')){
             router.push(router.locale+'/')
@@ -106,8 +109,7 @@ export default function SendMoney() {
 
 
     function listClients(){//Lists all the clients of the system
-
-        axios.get(DATABASE_URL + CLIENTS)
+        axios.post(DATABASE_URL + CLIENTS, {id: context.client.id})
             .then(response => {
                 setClients(response.data);
             })
@@ -138,11 +140,12 @@ export default function SendMoney() {
     //Withdraw the money for the person sending it
     function handleWithdraw(event){
         event.preventDefault();
-
         calculatesWithWallet(currency, amount, context.wallet, rejectTransaction, handleOpen);
     }
 
     const handleOpen = (event) => {
+        console.log('chegando aqui');
+
         setOpen(true);
     };
 
@@ -188,7 +191,7 @@ export default function SendMoney() {
             </div>
             <div className={classes.paper}>
                 {/*Message Alert*/}
-                <Alert props={setAlert}/>
+                <Alert props={showAlert}/>
                 <Avatar className={classes.avatar}>
                     <LockOutlinedIcon />
                 </Avatar>
@@ -207,7 +210,7 @@ export default function SendMoney() {
                             disabled={disabled}
                             label={labels.clientReceiverLabel}
                         />
-                    :
+                        :
                         //Automcomplete field with all the users listed
 
                         <Autocomplete

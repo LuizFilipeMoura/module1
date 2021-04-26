@@ -153,7 +153,7 @@ export default function Dashboard() {
                 <div key={index + 'divContainer'}>
                     <div className="m-2 d-flex justify-content-center align-items-center " key={index + 'divHeader'}>
                         <div key={index + 'div'}>
-                            <h3 key={index + 'h3'}>{labels.operationLabel}</h3>
+                            <h3 key={index + 'h3'}>{labels.operationLabel[index]}</h3>
                         </div>
 
                         <div className="m-2" key={index + 'div3'}>

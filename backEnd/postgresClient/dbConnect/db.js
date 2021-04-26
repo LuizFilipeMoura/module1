@@ -7,9 +7,9 @@ async function connect() {
     //Configuring the pool connection
     const { Pool } = require('pg');
     const pool = new Pool({
-        host: 'pgtest',
-        user: 'docker',
-        password: 'docker',
+        host: 'localhost',
+        user: 'postgres',
+        password: 'postgres',
         database: 'forex'
     });
 

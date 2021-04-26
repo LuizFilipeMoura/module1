@@ -184,7 +184,7 @@ export default function Deposit() {
                 {deposits?.map(deposit =>
                     <div className="d-flex justify-content-center align-items-center" >
                         <div className={deposit.status === 'DONE' ? 'alert alert-success w-100' : 'alert alert-danger w-100' } >
-                            <p>{labels.depositLabel} {labels.doneLabel}</p> <strong>
+                            <p>{labels.depositLabel} {deposit.status === 'DONE' ? labels.doneLabel : labels.pendingLabel }</p> <strong>
                             <p>{labels.amountLabel}: {deposit.amount}</p>
                             <p>{labels.currencyLabel}: {deposit.currency}</p>
 

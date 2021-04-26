@@ -71,7 +71,7 @@ export default function Withdraw() {
         //If the user doesn`t have valid bank info it redirects to the bank info page
         if(context.client && (!context.client.bank_number || !context.client.account_number)){
             alert(labels.bankInfoAlert);
-            router.push(router.locale+'/bank-info')
+            router.push(router.locale+'/bankInfo')
         }
     });
 

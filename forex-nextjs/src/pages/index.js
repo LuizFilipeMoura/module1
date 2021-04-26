@@ -68,11 +68,8 @@ export default function SignIn() {
     useEffect(() => { //Erases the localStorage
         if(once){
             localStorage.clear();
-            context.loggout();
             setOnce(false);
-        }
-        if(localStorage.getItem('wallet')){
-            localStorage.clear();
+            context.updateContext(context);
         }
     });
 

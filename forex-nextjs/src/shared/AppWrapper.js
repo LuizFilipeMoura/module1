@@ -28,6 +28,9 @@ export function AppWrapper({ children }) {
 
     //Updates the view with the data of the context passed by parameter
     function updateContext(context){
+        if(!localStorage.getItem('wallet')){
+            setWallet({});
+        }
         setIsLogged(localStorage.getItem('isLogged'));
         if(!context.client){
             setClient(JSON.parse(localStorage.getItem('client')))

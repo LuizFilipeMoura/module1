@@ -23,8 +23,8 @@ export function Labels({ children }) {
         operationLabel: router.locale === 'en-US' ? ['Buying', 'Selling'] : ['Comprando', 'Vendendo'],
         tradeButtonLabel: router.locale === 'en-US' ? 'TRADE!' : 'NEGOCIAR!',
         equalsToLabel: router.locale === 'en-US' ? 'equals to' : 'é igual a',
-        successTransactionLabel: router.locale === 'en-US' ? '✓ Transaction Successful!'
-        : '✓ Transação Bem-sucedida!',
+        successTransactionLabel: router.locale === 'en-US' ? '✓ Successful!'
+        : '✓ Sucesso!',
         failTransactionLabel: router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ',
         placeholderLabel: router.locale === 'en-US' ? 'Please insert amount here' : 'Por favor informar o montante aqui',
         profileLabel: router.locale === 'en-US' ? 'Profile' : 'Perfil',

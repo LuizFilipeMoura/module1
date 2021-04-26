@@ -60,19 +60,18 @@ async function put(req, res, next){
     res.send('success');
 }
 
-//Lists the clients for the autocomplete input
-async function get(req, res, next){
-    const sql = 'SELECT id,name, email from clients';
+//Lists the clients for the autocomplete input. Except the one using
+async function getClients(req, res, next){
+    const sql = 'SELECT id,name, email from clients where id != $1';
+    const values = [ req.body.id ]; //Query Values
     const client =  (await connect);
-    let result = await client.query(sql); //Executes the query
-    console.log();
+    let result = await client.query(sql, values ); //Executes the query
     console.log('success');
     res.send(result.rows);
 }
 
 async function changepassword(req, res, next){
     if(req.body && req.body.id && req.body.password){
-        console.log(req.body);
         const sql = 'UPDATE clients set password = $1 where id = $2';
 
         const values = [ req.body.password, req.body.id ]; //Query Values
@@ -88,4 +87,4 @@ async function changepassword(req, res, next){
 }
 
 
-module.exports = { signIn, signUp, put, get, changepassword };
+module.exports = { signIn, signUp, put, getClients, changepassword };

@@ -59,7 +59,7 @@ const DrawerList = ({props}) => {
                         <ListItem button key={text} onClick={()=>
 
                             {router.push({ pathname: router.locale +'/' + (index === 0 ? 'profile'
-                                : index === 1 ? 'bank-info'
+                                : index === 1 ? 'bankInfo'
                                     : index === 2 ? 'history'
                                         : index === 3 ? 'withdraw'
                                             : index === 4 ? 'deposit'

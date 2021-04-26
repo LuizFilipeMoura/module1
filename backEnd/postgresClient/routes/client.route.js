@@ -7,10 +7,10 @@ const client_controller = require('../controllers/clientController');
 
 
 //REST routing.
-// POST/signin get the values that user based on the email and password given
-// POST/signup sign up the user
+// POST '/signin' get the values that user based on the email and password given
+// POST '/signup' sign up the user
 // PUT for update
-// GET for listing the users
+// POST '/' Lists the users
 
 router.post('/signin', (req, res, next) => {
     //Pushes promise into the queue, when it is resolved the user receives the data
@@ -59,11 +59,11 @@ router.put('/changepassword', (req, res, next) => {
 
 
 //Gets all the names and email of all users
-router.get('/', (req, res, next) => {
+router.post('/', (req, res, next) => {
     //Pushes promise into the queue, when it is resolved the user receives the data
     q.push(function () {//Add transaction to the queue and resolves if the promise is resolved
         return new Promise(function (resolve, reject) {
-            const result = client_controller.get(req, res, next);
+            const result = client_controller.getClients(req, res, next);
             resolve(result)
         })
     });

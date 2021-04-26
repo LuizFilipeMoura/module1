@@ -1,6 +1,7 @@
 //Show messages
 export function rejectTransactionGlobal(setAlert){
     setAlert('fail');
+
     setTimeout(function(){ setAlert(''); }, 3000);
 }
 export function sucessfulTransactionGlobal(setAlert){

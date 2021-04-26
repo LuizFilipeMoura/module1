@@ -123,7 +123,7 @@ export default function SendMoney() {
                 <span>
                     <div className=" justify-content-center align-items-center mb-4">
                         <h4>{labels.sendLinkLabel}</h4>
-                        <a >{labels.link}</a>
+                        <a >{link}</a>
 
                     </div>
                     <div className="d-flex justify-content-center align-items-center mb-4">

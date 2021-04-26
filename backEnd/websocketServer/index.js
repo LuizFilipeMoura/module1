@@ -16,7 +16,7 @@ wss.on('connection', function connection(ws) {
     console.log('Conected');
 
     if(ws){
-        // getLastest();
+        getLastest();
         ws.send(JSON.stringify(infoBundle));
     }
 
@@ -35,7 +35,7 @@ let schedueler = function(ws) {
     setInterval(function(){
 
         if(ws){
-            // getLastest();
+            getLastest();
             ws.send(JSON.stringify(infoBundle));
         }
 
