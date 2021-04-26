@@ -9,38 +9,25 @@ import Input from "@material-ui/core/Input";
 import MenuItem from "@material-ui/core/MenuItem";
 import Checkbox from "@material-ui/core/Checkbox";
 import ListItemText from "@material-ui/core/ListItemText";
+import {useLabels} from "../shared/labels";
+import {localeStringGlobal} from "../shared/globalFunctions";
 
 
 export default function AccountBalance (){
     let context = useAppContext();
     let router = useRouter();
+    let labels = useLabels().labels;
 
     let [operations, setOperations] = useState([]);
-
     let [trades, setTrades] = useState();
     let [filters, setFilters] = useState([]);
-
     let [deposits, setDeposits] = useState();
     let [withdraws, setWithdraws] = useState();
     let [filteredOperations, setFilteredOperations] = useState([]);
-
     let operationArray = [];
     const [once, setOnce] = React.useState(true);
 
-    let dataLabel = router.locale === 'en-US' ? 'Date' : 'Data';
-    let operationLabel = router.locale === 'en-US' ? 'Operation' : 'Operação';
-    let currencyLabel = router.locale === 'en-US' ? 'Currency' : 'Moeda';
-    let amountLabel = router.locale === 'en-US' ? 'Amount' : 'Montante';
-    let accountBalanceLabel = router.locale === 'en-US' ? 'Account Balance' : 'Balanço de Conta';
-    let withdrawLabel = router.locale === 'en-US' ? 'WITHDRAW': 'SAQUE';
-    let depositLabel  = router.locale === 'en-US' ? 'DEPOSIT' : 'DEPÓSITO';
-    let operationTypeLabel  = router.locale === 'en-US' ? 'Filter by Operation Type' : 'Filtrar por tipo de operação';
-
-    let tradeLabel  = 'TRADE';
-
-
     useEffect(() => {
-
 
         //List trades, withdraws and deposits
         if(context.client && once && !trades && !deposits && !withdraws){
@@ -70,12 +57,12 @@ export default function AccountBalance (){
             operationArray.push( trade);
         }
         for(let deposit of deposits){
-            deposit.operationType = depositLabel;
+            deposit.operationType = labels.depositLabel;
             deposit.obs = deposit.obs ? deposit.obs: '';
             operationArray.push( deposit);
         }
         for(let withdraw of withdraws){
-            withdraw.operationType = withdrawLabel;
+            withdraw.operationType = labels.withdrawLabel;
             withdraw.obs = withdraw.obs ? withdraw.obs: '';
             operationArray.push(withdraw);
         }
@@ -142,16 +129,16 @@ export default function AccountBalance (){
     };
 
     const operationTypes = [
-        withdrawLabel,
-        depositLabel,
-        tradeLabel,
+        labels.withdrawLabel,
+        labels.depositLabel,
+        labels.tradeLabel,
     ];
 
     return(
         <div>
             <div className="m-3">
                 {/*Filter input*/}
-               {operationTypeLabel}
+               {labels.operationTypeLabel}
                 <Select
                     id="demo-mutiple-checkbox"
                     multiple
@@ -172,14 +159,14 @@ export default function AccountBalance (){
             <div className="d-flex justify-content-md-center align-items-center">
 
                 <div className="text-center align-center  w-75">
-                    <h3>{accountBalanceLabel}</h3>
+                    <h3>{labels.accountBalanceLabel}</h3>
                     <table className="table table-light">
                         <thead>
                         <tr>
-                            <th scope="col">{dataLabel}</th>
-                            <th scope="col">{operationLabel}</th>
-                            <th scope="col">{currencyLabel}</th>
-                            <th scope="col">{amountLabel}</th>
+                            <th scope="col">{labels.dataLabel}</th>
+                            <th scope="col">{labels.operationLabel}</th>
+                            <th scope="col">{labels.currencyLabel}</th>
+                            <th scope="col">{labels.amountLabel}</th>
                             <th scope="col">Obs</th>
                         </tr>
                         </thead>
@@ -190,8 +177,7 @@ export default function AccountBalance (){
                         { filteredOperations?.map( (operation,index) =>
 
                             <tr key={index}>
-                                <th scope="row">{(new Date(operation.date)).toLocaleDateString() + ' '+ (new Date(operation.date)).getHours() + ':' +
-                                ((new Date(operation.date)).getUTCMinutes() <= 9? '0' + (new Date(operation.date)).getUTCMinutes(): (new Date(operation.date)).getUTCMinutes() ) }
+                                <th scope="row">{ localeStringGlobal(operation) }
                                 </th>
                                 <td>
                                     {operation.operationType}

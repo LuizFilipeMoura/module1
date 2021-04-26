@@ -12,6 +12,7 @@ import Container from '@material-ui/core/Container';
 import {useRouter} from "next/router";
 import {CLIENTS, DATABASE_URL} from "../shared/enviroment";
 import {useAppContext} from "../shared/AppWrapper";
+import {useLabels} from "../shared/labels";
 
 
 const {useState} = require("react");
@@ -41,12 +42,7 @@ export default function BankInfo() {
     let context = useAppContext();
     const classes = useStyles();
     let router = useRouter();
-
-    let bankNumberLabel = router.locale === 'en-US' ? 'Bank Number' : 'Número do Banco';
-    let accountNumberLabel = router.locale === 'en-US' ? 'Account Number' : 'Número da conta';
-    let saveLabel = router.locale === 'en-US' ? 'Save Info' : 'Salvar Info';
-    let bankInfoLabel = router.locale === 'en-US' ? 'Bank Info' : 'Informações Bancárias';
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
+    let labels = useLabels().labels;
 
     let [bankNumber, setBankNumber] = useState('');
     let [accountNumber, setAccountNumber] = useState('');
@@ -89,7 +85,7 @@ export default function BankInfo() {
                     {
                         showAlert === 'success'?
                             <div className="alert alert-success" role="alert">
-                                {successTransactionLabel}
+                                {labels.successTransactionLabel}
                             </div>
                             : ''
                     }
@@ -98,7 +94,7 @@ export default function BankInfo() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {bankInfoLabel}
+                    {labels.bankInfoLabel}
                 </Typography>
                 <form className={classes.form} onSubmit={handleSaveInfo}>
 
@@ -111,7 +107,7 @@ export default function BankInfo() {
                         required
                         fullWidth
                         onChange={(event) => setBankNumber(event.target.value)}
-                        label={bankNumberLabel}
+                        label={labels.bankNumberLabel}
                         name="bank-number"
                         autoFocus
                     />
@@ -125,7 +121,7 @@ export default function BankInfo() {
                         fullWidth
                         name="account-number"
                         onChange={(event) => setAccountNumber(event.target.value)}
-                        label={accountNumberLabel}
+                        label={labels.accountNumberLabel}
                     />
                     <Button
                         type="submit"
@@ -134,7 +130,7 @@ export default function BankInfo() {
                         color="primary"
                         className={classes.submit}
                     >
-                        {saveLabel}
+                        {labels.saveLabel}
                     </Button>
                 </form>
             </div>

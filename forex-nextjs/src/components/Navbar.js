@@ -3,7 +3,6 @@ import Drawer from "@material-ui/core/Drawer";
 import DrawerList from "./Drawer";
 import React, {useEffect} from "react";
 import {useAppContext} from "../shared/AppWrapper";
-
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles({//Define the style of the page
@@ -47,7 +46,7 @@ const Navbar = ({currencies, wallet, client}) => {
                 <React.Fragment >
                     <Button onClick={toggleDrawer('right', true)}>{client?.name}</Button>
                     <Drawer anchor='right' open={state['right']} onClose={toggleDrawer('right', false)} classes={{paper: classes.paper}}>
-                        <DrawerList />
+                        <DrawerList/>
                     </Drawer>
                 </React.Fragment>
 

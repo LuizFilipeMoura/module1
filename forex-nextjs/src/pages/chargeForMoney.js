@@ -14,6 +14,8 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import QRCode from "react-qr-code";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
+import {NEXTJS_URL} from "../shared/enviroment";
+import {useLabels} from "../shared/labels";
 const {useState} = require("react");
 
 const useStyles = makeStyles((theme) => ({
@@ -40,17 +42,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SendMoney() {
     let context = useAppContext();
-
     const classes = useStyles();
-
     let router = useRouter();
-
-    let chargeLabel = router.locale === 'en-US' ? 'Charge' : 'Cobrar';
-
-    let currencyLabel = router.locale === 'en-US' ? 'Currency' : 'Moeda';
-    let amountLabel = router.locale === 'en-US' ? 'Amount' : 'Montante';
-    let sendLinkLabel = router.locale === 'en-US' ? 'Send this link to charge' : 'Envie esse link para cobrar';
-    let qrCodeLabel = router.locale === 'en-US' ? 'Or Send this QRCode' : 'Ou envie esse QRCode';
+    let labels = useLabels().labels;
 
     let [currency, setCurrency] = useState('USD');
     let [amount, setAmount] = useState(0);
@@ -65,7 +59,7 @@ export default function SendMoney() {
 
     function generateLink(event) {
         event.preventDefault();
-        setLink('http://localhost:3000/sendmoney?amount='+amount + '&currency=' + currency + '&receiver_id=' + context.client.id);
+        setLink(NEXTJS_URL + 'sendmoney?amount='+amount + '&currency=' + currency + '&receiver_id=' + context.client.id);
     }
 
     return (
@@ -79,10 +73,10 @@ export default function SendMoney() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {chargeLabel}
+                    {labels.chargeLabel}
                 </Typography>
                 <form className={classes.form} onSubmit={generateLink}>
-                    <InputLabel id="demo-simple-select-label">{currencyLabel}</InputLabel>
+                    <InputLabel id="demo-simple-select-label">{labels.currencyLabel}</InputLabel>
                     <Select
                         value={currency}
                         variant="outlined"
@@ -101,7 +95,7 @@ export default function SendMoney() {
                         style={{marginTop: '15px'}}
                         variant="outlined"
                         name="input-name"
-                        label={amountLabel}
+                        label={labels.amountLabel}
                         defaultValue={0.00}
                         fullWidth
                         decimalsLimit={2}
@@ -119,7 +113,7 @@ export default function SendMoney() {
                         color="primary"
                         className={classes.submit}
                     >
-                        {chargeLabel}!
+                        {labels.chargeLabel}!
                     </Button>
                 </form>
 
@@ -128,12 +122,12 @@ export default function SendMoney() {
                 {link ?
                 <span>
                     <div className=" justify-content-center align-items-center mb-4">
-                        <h4>{sendLinkLabel}</h4>
-                        <a >{link}</a>
+                        <h4>{labels.sendLinkLabel}</h4>
+                        <a >{labels.link}</a>
 
                     </div>
                     <div className="d-flex justify-content-center align-items-center mb-4">
-                        <h3>{qrCodeLabel}</h3>
+                        <h3>{labels.qrCodeLabel}</h3>
                     </div>
                     <div className="d-flex justify-content-center align-items-center mb-4">
                         <QRCode id="QRCode" value={link} />

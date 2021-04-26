@@ -13,6 +13,7 @@ import Container from '@material-ui/core/Container';
 import {useRouter} from "next/router";
 import {CLIENTS, DATABASE_URL} from "../shared/enviroment";
 import {useAppContext} from "../shared/AppWrapper";
+import {useLabels} from "../shared/labels";
 const md5 = require('md5');
 
 
@@ -43,17 +44,7 @@ export default function ChangePassword() {
     let context = useAppContext();
     const classes = useStyles();
     let router = useRouter();
-
-    let passwordLabel = router.locale === 'en-US' ? 'New Password' : 'Nova Senha';
-    let repeatPasswordLabel = router.locale === 'en-US' ? 'Repeat new Password' : 'Repetir a nova Senha';
-    let changePasswordLabel = router.locale === 'en-US' ? 'Change Password' : 'Mudar Senha';
-    let saveLabel = router.locale === 'en-US' ? 'Save' : 'Salvar';
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ Profile saved' : '✓ Perfil salvo!';
-    let oldPasswordLabel = router.locale === 'en-US' ? 'Old Password' : 'Senha antiga';
-    let wrongPasswordLabel = router.locale === 'en-US' ? 'Wrong password' : 'Senha inválida';
-    let passwordNotMatchLabel = router.locale === 'en-US' ? 'Password don`t match' : 'Senhas não são estão iguais';
-    let passwordLengthLabel = router.locale === 'en-US' ? 'Password need to be at least 6 characthers long' :
-        'Senhas precisam ter pelo menos 6 caracteres';
+    let labels = useLabels().labels;
 
     let [showAlert, setAlert] = React.useState('');
     let [oldPassword, setOldPassword] = useState('');
@@ -72,17 +63,17 @@ export default function ChangePassword() {
         event.preventDefault();
 
         if(password !== repeatPassword) {
-            alert(passwordNotMatchLabel)
+            alert(labels.passwordNotMatchLabel)
         }
         else if(password.length < 6) {
-            alert(passwordLengthLabel)
+            alert(labels.passwordLengthLabel)
         } else {
             let credentials = {email: context.client.email, password: md5(oldPassword)};
             axios.post(DATABASE_URL + CLIENTS+ '/signin', credentials).then( res => {
 
                 //Validates the credentials
                 if(res.data === 'Password wrong'){
-                    alert(wrongPasswordLabel)
+                    alert(labels.wrongPasswordLabel)
                 } else {
                     //Changes the password
                     let user = {id: context.client.id, password: md5(password)};
@@ -112,7 +103,7 @@ export default function ChangePassword() {
                     {
                         showAlert === 'success'?
                             <div className="alert alert-success" role="alert">
-                                {successTransactionLabel}
+                                {labels.successTransactionLabel}
                             </div>
                             : ''
                     }
@@ -121,7 +112,7 @@ export default function ChangePassword() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {changePasswordLabel}
+                    {labels.changePasswordLabel}
                 </Typography>
                 <form className={classes.form} onSubmit={handlePasswordChanging}>
                     <TextField
@@ -131,7 +122,7 @@ export default function ChangePassword() {
                         fullWidth
                         name="password"
                         onChange={(event) => setOldPassword(event.target.value)}
-                        label={oldPasswordLabel}
+                        label={labels.oldPasswordLabel}
                         type="password"
                         id="password"
                     />
@@ -142,7 +133,7 @@ export default function ChangePassword() {
                         fullWidth
                         name="password"
                         onChange={(event) => setPassword(event.target.value)}
-                        label={passwordLabel}
+                        label={labels.passwordLabel}
                         type="password"
                         id="newPassword"
                         autoComplete="current-password"
@@ -154,7 +145,7 @@ export default function ChangePassword() {
                         fullWidth
                         name="password"
                         onChange={(event) => setRepeatPassword(event.target.value)}
-                        label={repeatPasswordLabel}
+                        label={labels.repeatPasswordLabel}
                         type="password"
                         id="repeatPassword"
                         autoComplete="current-password"
@@ -166,7 +157,7 @@ export default function ChangePassword() {
                         color="primary"
                         className={classes.submit}
                     >
-                        {saveLabel}
+                        {labels.saveLabel}
                     </Button>
                 </form>
             </div>

@@ -20,6 +20,9 @@ import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
+import {useLabels} from "../../shared/labels";
+import {calculatesWithWallet, rejectTransactionGlobal, sucessfulTransactionGlobal} from "../../shared/globalFunctions";
+import Alert from "../../components/Alert";
 
 
 const {useState} = require("react");
@@ -64,19 +67,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SendMoney() {
     let context = useAppContext();
-
     const classes = useStyles();
-
     let router = useRouter();
-
-    let sendMoneyLabel = router.locale === 'en-US' ? 'Send Money' : 'Enviar dinheiro';
-    let sendLabel = router.locale === 'en-US' ? 'Send!' : 'Enviar!';
-    let currencyLabel = router.locale === 'en-US' ? 'Currency' : 'Moeda';
-    let amountLabel = router.locale === 'en-US' ? 'Amount' : 'Montante';
-    let clientReceiverLabel = router.locale === 'en-US' ? 'Receiver\'s name' : 'Nome do Recebedor';
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
-    let failTransactionLabel = router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ';
-    let cancelLabel = router.locale === 'en-US' ? 'Cancel' : 'Cancelar';
+    let labels = useLabels().labels;
 
     let [clients, setClients] = useState([]);
     let [clientReceiver, setClientReceiver] = useState();
@@ -125,12 +118,10 @@ export default function SendMoney() {
 
     //Show messages
     function rejectTransaction(){
-        setAlert('fail');
-        setTimeout(function(){ setAlert(''); }, 3000);
+        rejectTransactionGlobal(setAlert);
     }
     function sucessfulTransaction(){
-        setAlert('success');
-        setTimeout(function(){ setAlert(''); }, 3000);
+        sucessfulTransactionGlobal(setAlert);
     }
 
     //Deposit the money for the person receiving it
@@ -148,17 +139,7 @@ export default function SendMoney() {
     function handleWithdraw(event){
         event.preventDefault();
 
-        if(currency === 'USD' && amount > context.wallet.dollaramount){// Rejects the transaction if the user cant afford
-            rejectTransaction()
-        } else if(currency === 'BRL' && amount > context.wallet.realamount){
-            rejectTransaction()
-        }else if(currency === 'EUR' && amount > context.wallet.euroamount){
-            rejectTransaction()
-        }else if(currency === 'GBP' && amount > context.wallet.poundamount){
-            rejectTransaction()
-        } else{
-            handleOpen()
-        }
+        calculatesWithWallet(currency, amount, context.wallet, rejectTransaction, handleOpen);
     }
 
     const handleOpen = (event) => {
@@ -197,35 +178,22 @@ export default function SendMoney() {
                 >
                     <Fade in={open}>
                         <div className={classes.paper}>
-                            <h4 id="transition-modal-title">{clientReceiverLabel}:{clientReceiver?.name}</h4>
-                            <h5 id="transition-modal-title">{clientReceiverLabel} Email: {clientReceiver?.email}</h5>
-                            <Button onClick={doTransaction}>{sendLabel}</Button>
-                            <Button onClick={handleClose}>{cancelLabel}</Button>
+                            <h4 id="transition-modal-title">{labels.clientReceiverLabel}:{clientReceiver?.name}</h4>
+                            <h5 id="transition-modal-title">{labels.clientReceiverLabel} Email: {clientReceiver?.email}</h5>
+                            <Button onClick={doTransaction}>{labels.sendLabel}</Button>
+                            <Button onClick={handleClose}>{labels.cancelLabel}</Button>
                         </div>
                     </Fade>
                 </Modal>
             </div>
             <div className={classes.paper}>
                 {/*Message Alert*/}
-                <div className="m-2 d-flex justify-content-center align-items-center ">
-                    {
-                        showAlert === 'success'?
-                            <div className="alert alert-success" role="alert">
-                                {successTransactionLabel}
-                            </div>
-                            : showAlert === 'fail' ?
-                            <div className="alert alert-danger" role="alert">
-                                {failTransactionLabel}
-                            </div>
-                            : ''
-                    }
-
-                </div>
+                <Alert props={setAlert}/>
                 <Avatar className={classes.avatar}>
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {sendMoneyLabel}
+                    {labels.sendMoneyLabel}
                 </Typography>
                 <form className={classes.form} onSubmit={handleWithdraw}>
                     {clientReceiver ?
@@ -237,7 +205,7 @@ export default function SendMoney() {
                             name="client"
                             fullWidth
                             disabled={disabled}
-                            label={clientReceiverLabel}
+                            label={labels.clientReceiverLabel}
                         />
                     :
                         //Automcomplete field with all the users listed
@@ -253,11 +221,11 @@ export default function SendMoney() {
                                 setClientReceiver(newValue);
                             }}
                             renderInput={(params) => <TextField
-                                required {...params} label={clientReceiverLabel} variant="outlined" />}
+                                required {...params} label={labels.clientReceiverLabel} variant="outlined" />}
                         />
                     }
 
-                    <InputLabel id="demo-simple-select-label">{currencyLabel}</InputLabel>
+                    <InputLabel id="demo-simple-select-label">{labels.currencyLabel}</InputLabel>
                     <Select
                         value={currency}
                         variant="outlined"
@@ -280,7 +248,7 @@ export default function SendMoney() {
                         disabled={disabled}
                         variant="outlined"
                         name="input-name"
-                        label={amountLabel}
+                        label={labels.amountLabel}
                         defaultValue={0.00}
                         fullWidth
                         decimalsLimit={2}
@@ -298,7 +266,7 @@ export default function SendMoney() {
                         color="primary"
                         className={classes.submit}
                     >
-                        {sendLabel}
+                        {labels.sendLabel}
                     </Button>
                 </form>
             </div>

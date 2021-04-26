@@ -26,11 +26,6 @@ const useStyles = makeStyles({//Define the style of the page
 
 const DrawerList = ({props}) => {
     const classes = useStyles();
-
-    const [state, setState] = React.useState({
-        left: false,
-    });
-
     let router = useRouter();
 
     //I18n labels
@@ -39,7 +34,6 @@ const DrawerList = ({props}) => {
     let bankInfoLabel= router.locale === 'en-US' ? 'Bank Info' : 'Informações bancárias';
     let depositLabel= router.locale === 'en-US' ? 'Deposit' : 'Depositar';
     let accountBalanceLabel = router.locale === 'en-US' ? 'Account Balance' : 'Balanço de Conta';
-
     let withdrawLabel= router.locale === 'en-US' ? 'Withdraw' : 'Sacar';
     let historyLabel= router.locale === 'en-US' ? 'History' : 'Histórico';
     let logoutLabel= router.locale === 'en-US' ? 'Logout' : 'Sair';

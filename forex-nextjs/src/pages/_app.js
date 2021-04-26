@@ -7,6 +7,7 @@ import theme from '../theme';
 import 'bootstrap/dist/css/bootstrap.css'
 import Layout from "../components/Layout";
 import {AppWrapper} from "../shared/AppWrapper";
+import {Labels} from "../shared/labels";
 
 export default function MyApp(props) {
     const { Component, pageProps } = props;
@@ -34,7 +35,9 @@ export default function MyApp(props) {
                 <AppWrapper>
                     {/*Provides layout to all child components*/}
                     <Layout>
-                        <Component {...pageProps} />
+                        <Labels>
+                            <Component {...pageProps} />
+                        </Labels>
                     </Layout>
                 </AppWrapper>
             </ThemeProvider>

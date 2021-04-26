@@ -15,6 +15,15 @@ import {DATABASE_URL, PASTTRADES, WALLETS, WEBSOCKET_URL} from "../shared/enviro
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import { useAppContext} from "../shared/AppWrapper";
+import {
+    calculatesWithWallet,
+    handleCurrencyInputGlobal,
+    rejectTransactionGlobal,
+    sucessfulTransactionGlobal,
+    updatesWalletGlobal
+} from "../shared/globalFunctions";
+import {useLabels} from "../shared/labels";
+import Alert from "../components/Alert";
 
 
 
@@ -43,7 +52,9 @@ export default function Dashboard() {
     const classes = useStyles();
     let [rate, setRate] = useState({});
     let context = useAppContext();
+    let labels = useLabels().labels;
     let currencies = context.currencies;
+    let router = useRouter();
 
     let [buyingCurrency, setBuyingCurrency] = React.useState(currencies[0][0]);
     let [sellingCurrency, setSellingCurrency] = React.useState(currencies[1][0]);
@@ -51,22 +62,7 @@ export default function Dashboard() {
     let [sellingSymbol, setSellingSymbol] = React.useState();
     let [buyingAmount, setBuyingAmount] = React.useState(0.00);
     let [sellingAmount, setSellingAmount] = React.useState(0.00);
-
     let [showAlert, setAlert] = React.useState('');
-
-    //I18n translations
-    let router = useRouter();
-
-    let dashboardLabel = router.locale === 'en-US' ? 'Dashboard' : 'Painel';
-    let buyButtonLabel = router.locale === 'en-US' ? 'Buy' : 'Comprar';
-    let sellButtonLabel = router.locale === 'en-US' ? 'Sell' : 'Vender';
-    let operationLabel = router.locale === 'en-US' ? ['Buying', 'Selling'] : ['Comprando', 'Vendendo'];
-    let tradeButtonLabel = router.locale === 'en-US' ? 'TRADE!' : 'NEGOCIAR!';
-    let equalsToLabel = router.locale === 'en-US' ? 'equals to' : 'é igual a';
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ Transaction Successful! Wallet and History updated'
-        : '✓ Transação Bem-sucedida! Carteira e histórico atualizadas';
-    let failTransactionLabel = router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ';
-    let placeholderLabel = router.locale === 'en-US' ? 'Please insert amount here' : 'Por favor informar o montante aqui';
 
     const wsClient = new W3CWebSocket(WEBSOCKET_URL); //WebSocket Connection
 
@@ -79,8 +75,8 @@ export default function Dashboard() {
         if(!context.isLogged && !localStorage.getItem('isLogged')){
             router.push(router.locale+'/')
         }
-        //Adjust the symbol
 
+        //Adjust the symbol
         for(const currency of context.currencies){
             if(currency[0] === buyingCurrency){
                 setBuyingSymbol(currency[1])
@@ -94,34 +90,7 @@ export default function Dashboard() {
 
     function updatesWallet(givenTransaction){ // Updates the wallet values for each currency
 
-        givenTransaction.from_amount = Number(givenTransaction.from_amount.toFixed(2));
-        givenTransaction.to_amount = Number(givenTransaction.to_amount.toFixed(2));
-
-        if(givenTransaction.from_currency === 'BRL'){
-            context.wallet.realamount += givenTransaction.from_amount;
-        }
-        else if(givenTransaction.from_currency === 'USD'){
-            context.wallet.dollaramount += givenTransaction.from_amount;
-        }
-        else if(givenTransaction.from_currency === 'GBP'){
-            context.wallet.poundamount += givenTransaction.from_amount;
-        }
-        else if(givenTransaction.from_currency === 'EUR'){
-            context.wallet.euroamount += givenTransaction.from_amount;
-        }
-
-        if(givenTransaction.to_currency === 'BRL'){
-            context.wallet.realamount -= givenTransaction.to_amount;
-        }
-        else if(givenTransaction.to_currency === 'USD'){
-            context.wallet.dollaramount -= givenTransaction.to_amount;
-        }
-        else if(givenTransaction.to_currency === 'GBP'){
-            context.wallet.poundamount -= givenTransaction.to_amount;
-        }
-        else if(givenTransaction.to_currency === 'EUR'){
-            context.wallet.euroamount -= givenTransaction.to_amount;
-        }
+        context.wallet = updatesWalletGlobal(givenTransaction, context.wallet);
 
         axios.put(DATABASE_URL + WALLETS, context.wallet).then( res => {
             context.updateContext(context);
@@ -140,6 +109,12 @@ export default function Dashboard() {
 
     function handleOperation() {//Stores the operation if it meets the requirements
 
+        calculatesWithWallet(sellingCurrency, sellingAmount, context.wallet, rejectTransaction, success);
+
+    }
+
+    function success() {
+
         let transaction = {
             from_currency: buyingCurrency,
             to_currency: sellingCurrency,
@@ -149,105 +124,36 @@ export default function Dashboard() {
             date: new Date()
         };
 
-        if(sellingCurrency === 'USD' && sellingAmount > context.wallet.dollaramount){// Rejects the transaction if the user cant afford
-            rejectTransaction()
-        } else if(sellingCurrency === 'BRL' && sellingAmount > context.wallet.realamount){
-            rejectTransaction()
-        }else if(sellingCurrency === 'EUR' && sellingAmount > context.wallet.euroamount){
-            rejectTransaction()
-        }else if(sellingCurrency === 'GBP' && sellingAmount > context.wallet.poundamount){
-            rejectTransaction()
-        } else{
-            sucessfulTransaction();
-            axios.put(DATABASE_URL + PASTTRADES, transaction).then( res => {
-                context.updateContext(context);
-            });
-            updatesWallet(transaction)
-        }
+        sucessfulTransaction();
+        axios.put(DATABASE_URL + PASTTRADES, transaction).then( res => {
+            context.updateContext(context);
+        });
+        updatesWallet(transaction)
     }
 
     function handleCurrencyInput(operation, value){ //Calculates the amount of each currency the user has after the input
-        if(operation === 0){//If the operation is buying
-            setBuyingAmount(value);
-            if(buyingCurrency === 'USD'){
-                if(sellingCurrency === 'EUR'){
-                    setSellingAmount(value * rate.usdTOeur)
-                }
-                else if(sellingCurrency === 'BRL'){
-                    setSellingAmount(value * rate.usdTObrl)
-                }
-                else if(sellingCurrency === 'GBP'){
-                    setSellingAmount(value * rate.usdTOgbp)
-                }
-            } else {
-                if(buyingCurrency === 'EUR'){
-                    setSellingAmount(value * (1/rate.usdTOeur))
-                }
-                else if(buyingCurrency === 'BRL'){
-                    setSellingAmount(value * (1/rate.usdTObrl))
-                }
-                else if(buyingCurrency === 'GBP'){
-                    setSellingAmount(value * (1/rate.usdTOgbp))
-                }
-            }
-        } else{ //If it is a selling amount input
-            setSellingAmount(value);
-            if(buyingCurrency === 'USD'){
-
-                if(sellingCurrency === 'EUR'){
-                    setBuyingAmount(value * (1/rate.usdTOeur))
-                }
-                else if(sellingCurrency === 'BRL'){
-                    setBuyingAmount(value * (1/rate.usdTObrl))
-                }
-                else if(sellingCurrency === 'GBP'){
-                    setBuyingAmount(value * (1/rate.usdTOgbp))
-                }
-            } else {
-                if(buyingCurrency === 'EUR'){
-                    setBuyingAmount(value * (rate.usdTOeur))
-                }
-                else if(buyingCurrency === 'BRL'){
-                    setBuyingAmount(value * (rate.usdTObrl))
-                }
-                else if(buyingCurrency === 'GBP'){
-                    setBuyingAmount(value * (rate.usdTOgbp))
-                }
-            }
-        }
+        handleCurrencyInputGlobal(operation, value, setBuyingAmount, buyingCurrency, sellingCurrency, setSellingAmount, rate);
     }
 
+    //Show messages
     function rejectTransaction(){
-        setAlert('fail');
-        setTimeout(function(){ setAlert(''); }, 3000);
+        rejectTransactionGlobal(setAlert);
     }
     function sucessfulTransaction(){
-        setAlert('success');
-        setTimeout(function(){ setAlert(''); }, 3000);
+        sucessfulTransactionGlobal(setAlert);
     }
 
     //The input for the values bellow the currencies card
     const buySellCard = () => (
         <div>
             {/*    Alerts for the operation */}
-            <div className="m-2 d-flex justify-content-center align-items-center ">
-                {
-                    showAlert === 'success'?
-                        <div className="alert alert-success" role="alert">
-                            {successTransactionLabel}
-                        </div>
-                        : showAlert === 'fail' ?
-                        <div className="alert alert-danger" role="alert">
-                            {failTransactionLabel}
-                        </div>
-                        : ''
-                }
-            </div>
+            <Alert props={showAlert}/>
+
             {[currencies[0], currencies[1]].map((currency, index) => (
                 <div key={index + 'divContainer'}>
                     <div className="m-2 d-flex justify-content-center align-items-center " key={index + 'divHeader'}>
                         <div key={index + 'div'}>
-                            <h3 key={index + 'h3'}>{operationLabel[index]}</h3>
+                            <h3 key={index + 'h3'}>{labels.operationLabel}</h3>
                         </div>
 
                         <div className="m-2" key={index + 'div3'}>
@@ -258,7 +164,7 @@ export default function Dashboard() {
                                 currencySymbol={index === 0? buyingSymbol: sellingSymbol}
                                 id={index === 0? 'buyingAmountInput': 'sellingAmountInput'}
                                 name="input-name"
-                                placeholder={placeholderLabel}
+                                placeholder={labels.placeholderLabel}
                                 defaultValue={0.00}
                                 decimalsLimit={2}
                                 decimalCharacter="."
@@ -326,7 +232,7 @@ export default function Dashboard() {
               {/*The bottom text where the calculations happen to give the value of the transaction to the client*/}
             <div className="m-2 d-flex justify-content-center align-items-center ">
 
-                <h5>{buyingAmount.toFixed(2)} {buyingCurrency} {equalsToLabel}</h5>
+                <h5>{buyingAmount.toFixed(2)} {buyingCurrency} {labels.equalsToLabel}</h5>
             </div>
 
             <div className="m-2 d-flex justify-content-center align-items-center ">
@@ -340,7 +246,7 @@ export default function Dashboard() {
                         handleOperation();
                     }}
                 >
-                    {tradeButtonLabel}
+                    {labels.tradeButtonLabel}
                 </Button>
             </div>
 
@@ -353,7 +259,7 @@ export default function Dashboard() {
                 {/*Title*/}
 
                 <div className="m-2 row">
-                    <h1>{dashboardLabel}</h1>
+                    <h1>{labels.dashboardLabel}</h1>
                 </div>
 
                 {/*Currencies dashboard*/}
@@ -390,7 +296,7 @@ export default function Dashboard() {
                                         setSellingCurrency('USD');
                                     }
                                 }}>
-                                    {buyButtonLabel}
+                                    {labels.buyButtonLabel}
                                 </Button>
                                 <Button size="small" color="secondary" onClick={()=> {
                                     setBuyingAmount(0);
@@ -409,7 +315,7 @@ export default function Dashboard() {
                                         setBuyingCurrency('USD');
                                     }
                                 }}>
-                                    {sellButtonLabel}
+                                    {labels.sellButtonLabel}
                                 </Button>
                             </CardActions>
                         </Card>

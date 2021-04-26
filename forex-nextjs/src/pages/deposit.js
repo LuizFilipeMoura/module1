@@ -18,6 +18,8 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
 import {number} from "prop-types";
+import {localeStringGlobal} from "../shared/globalFunctions";
+import {useLabels} from "../shared/labels";
 
 
 const {useState} = require("react");
@@ -47,19 +49,7 @@ export default function Deposit() {
     let context = useAppContext();
     const classes = useStyles();
     let router = useRouter();
-
-    let currencyLabel = router.locale === 'en-US' ? 'Currency' : 'Moeda';
-    let amountLabel = router.locale === 'en-US' ? 'Amount' : 'Montante';
-    let saveLabel = router.locale === 'en-US' ? 'Request Deposit' : 'Requerir Depósito';
-    let forexAccountLabel = router.locale === 'en-US' ? 'Account:' : 'Conta:';
-    let depositInstructionsLabel = router.locale === 'en-US' ? 'The deposit must be done in these following account:'
-        : 'O depósIto deverá ser feito na seguinte conta:';
-    let depositLabel = router.locale === 'en-US' ? 'Deposit' : 'Depósito';
-    let dateLabel = router.locale === 'en-US' ? 'Date' : 'Data';
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
-    let nameLabel = router.locale === 'en-US' ? 'Name: ' : 'Nome: ';
-    let doneLabel = router.locale === 'en-US' ? 'DONE' : 'FEITO';
-    let pendingLabel = router.locale === 'en-US' ? 'PENDING' : 'PENDENTE';
+    let labels = useLabels().labels;
 
     let [showAlert, setAlert] = React.useState('');
     let [currency, setCurrency] = useState('');
@@ -79,6 +69,7 @@ export default function Deposit() {
 
     function listDeposits(){//Lists the deposits on the dataBase for that client
 
+        console.log(context.client);
         axios.post(DATABASE_URL + DEPOSITS, context.client)
             .then(response => {
                 setDeposits(response.data.rows.length === 0 ? [] : response.data.rows);
@@ -92,14 +83,11 @@ export default function Deposit() {
     function handleDeposit(event){
         event.preventDefault();
         let request = {id: context.client.id, currency, amount, status: 'PENDING'};
-
         //Stores it in the database, The DB automatically adds the amount from the wallet when it is DONE
-        if(!Number(amount)){
-            axios.put(DATABASE_URL + DEPOSITS, request).then( res => {
-                sucessful();
-                listDeposits();
-            })
-        }
+        axios.put(DATABASE_URL + DEPOSITS, request).then( res => {
+            sucessful();
+            listDeposits();
+        })
     }
 
     function sucessful(){
@@ -116,7 +104,7 @@ export default function Deposit() {
                     {
                         showAlert === 'success'?
                             <div className="alert alert-success" role="alert">
-                                {successTransactionLabel}
+                                {labels.successTransactionLabel}
                             </div>
                             : ''
                     }
@@ -125,12 +113,12 @@ export default function Deposit() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {depositLabel}
+                    {labels.depositLabel}
                 </Typography>
 
 
                 <form className={classes.form} onSubmit={handleDeposit}>
-                    <InputLabel id="demo-simple-select-label">{currencyLabel}</InputLabel>
+                    <InputLabel id="demo-simple-select-label">{labels.currencyLabel}</InputLabel>
                     <Select
                         value={currency}
                         variant="outlined"
@@ -149,7 +137,7 @@ export default function Deposit() {
 
                         variant="outlined"
                         name="input-name"
-                        label={amountLabel}
+                        label={labels.amountLabel}
                         defaultValue={0.00}
                         fullWidth
                         decimalsLimit={2}
@@ -162,16 +150,16 @@ export default function Deposit() {
                     />
                     <div className="mt-5">
                         {/*Clients info for deposits*/}
-                        <p>{depositInstructionsLabel}</p>
+                        <p>{labels.depositInstructionsLabel}</p>
                         <p>FOREX: 0001</p>
                         {
                             context.client?
                                 <span>
-                                    <p>{forexAccountLabel} {(context.client.forex_account <= 9 ?
+                                    <p>{labels.forexAccountLabel} {(context.client.forex_account <= 9 ?
                                         '000' + (context.client.forex_account)
                                         : (context.client.forex_account) <= 9 ? '0' + (context.client.forex_account)
                                             :context.client.forex_account)}</p>
-                                    <p>{nameLabel}{context.client.name?.toUpperCase()}</p>
+                                    <p>{labels.nameLabel}{context.client.name?.toUpperCase()}</p>
                                 </span> : ''
                         }
 
@@ -184,7 +172,7 @@ export default function Deposit() {
                         color="primary"
                         className={classes.submit}
                     >
-                        {saveLabel}
+                        {labels.saveLabel}
                     </Button>
                 </form>
 
@@ -194,41 +182,24 @@ export default function Deposit() {
                 {/*List all the deposits for that client*/}
 
                 {deposits?.map(deposit =>
-
                     <div className="d-flex justify-content-center align-items-center" >
-                        {deposit.status === 'DONE'?
-                            <div className="alert alert-success w-100" role="alert">
-                                <p>{depositLabel} {doneLabel}</p> <strong>
-                                <p>{amountLabel}: {deposit.amount}</p>
-                                <p>{deposit.currency}</p>
-                            </strong>
-                                <p>{dateLabel}: {(new Date(deposit.date)).toLocaleDateString() + ' '+ (new Date(deposit.date)).getHours() + ':' +
-                                ((new Date(deposit.date)).getUTCMinutes() <= 9? '0' + (new Date(deposit.date)).getUTCMinutes(): (new Date(deposit.date)).getUTCMinutes() ) }</p>
-                                {deposit.obs && deposit.obs !== '' ?
-                                    <p> {router.locale === 'en-US' ?  deposit.obs : deposit.obs?.toString()
-                                        .replace('SENT', 'ENVIADO')
-                                        .replace('BY', 'POR')
-                                        .replace('TO', 'PARA')}</p>: ''}
-                            </div>
-                            :
-                            <div className="alert alert-danger w-100" role="alert">
-                                <p>{depositLabel} {pendingLabel}</p> <strong>
-                                <p>{amountLabel}: {deposit.amount}</p>
-                                <p>{currencyLabel}: {deposit.currency}</p>
-                            </strong>
-                                <p>{dateLabel}: {(new Date(deposit.date)).toLocaleDateString() + ' '+ (new Date(deposit.date)).getHours() + ':' +
-                                ((new Date(deposit.date)).getUTCMinutes() <= 9? '0' + (new Date(deposit.date)).getUTCMinutes(): (new Date(deposit.date)).getUTCMinutes() ) }</p>
-                                {deposit.obs && deposit.obs !== '' ?
-                                    <p> {router.locale === 'en-US' ?  deposit.obs : deposit.obs?.toString()
-                                        .replace('SENT', 'ENVIADO')
-                                        .replace('BY', 'POR')
-                                        .replace('TO', 'PARA')}</p>: ''}
-                            </div>
-                        }
+                        <div className={deposit.status === 'DONE' ? 'alert alert-success w-100' : 'alert alert-danger w-100' } >
+                            <p>{labels.depositLabel} {labels.doneLabel}</p> <strong>
+                            <p>{labels.amountLabel}: {deposit.amount}</p>
+                            <p>{labels.currencyLabel}: {deposit.currency}</p>
 
+                        </strong>
+                            <p>{localeStringGlobal(deposit)}</p>
+                            {/*Translates the obs */}
+
+                            {deposit.obs && deposit.obs !== '' ?
+                                <p>{router.locale === 'en-US' ?  deposit.obs : deposit.obs?.toString()
+                                    .replace('SENT', 'ENVIADO')
+                                    .replace('BY', 'POR')
+                                    .replace('TO', 'PARA')}</p>: ''}
+
+                        </div>
                     </div>
-
-
                 )}
 
             </div>

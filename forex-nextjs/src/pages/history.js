@@ -10,6 +10,8 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
+import {useLabels} from "../shared/labels";
+import {localeStringGlobal} from "../shared/globalFunctions";
 
 const useStyles = makeStyles((theme) => ({
     modal: {
@@ -32,16 +34,7 @@ export default function History (){
     let [btnValue, setBtnValue] = useState();
     let router = useRouter();
     const [open, setOpen] = React.useState(false);
-
-    let dataLabel = router.locale === 'en-US' ? 'Date' : 'Data';
-    let buyingLabel = router.locale === 'en-US' ? 'Buying' : 'Comprando';
-    let sellingLabel = router.locale === 'en-US' ? 'Selling' : 'Vendendo';
-    let deletingLabel = router.locale === 'en-US' ? 'You are sure you want to delete this transaction from your history?'
-        : 'Voce tem certeza que quer deletar essa transação do seu histórico?';
-    let yesLabel = router.locale === 'en-US' ? 'Yes' : 'Sim';
-    let cancelLabel = router.locale === 'en-US' ? 'Cancel' : 'Cancelar';
-    let historyLabel= router.locale === 'en-US' ? 'History' : 'Histórico';
-
+    let labels = useLabels().labels;
 
 
     useEffect(() => {
@@ -102,23 +95,23 @@ export default function History (){
                 >
                     <Fade in={open}>
                         <div className={classes.paper}>
-                            <h2 id="transition-modal-title">{deletingLabel}</h2>
-                            <Button onClick={makesDelete}>{yesLabel}</Button>
-                            <Button onClick={handleClose}>{cancelLabel}</Button>
+                            <h2 id="transition-modal-title">{labels.deletingLabel}</h2>
+                            <Button onClick={makesDelete}>{labels.yesLabel}</Button>
+                            <Button onClick={handleClose}>{labels.cancelLabel}</Button>
                         </div>
                     </Fade>
                 </Modal>
             </div>
 
             <div className="text-center align-center ">
-                <h3>{historyLabel}</h3>
+                <h3>{labels.historyLabel}</h3>
 
                 <table className="table table-light">
                     <thead>
                     <tr>
-                        <th scope="col">{dataLabel}</th>
-                        <th scope="col">{buyingLabel}</th>
-                        <th scope="col">{sellingLabel}</th>
+                        <th scope="col">{labels.dataLabel}</th>
+                        <th scope="col">{labels.buyingLabel}</th>
+                        <th scope="col">{labels.sellingLabel}</th>
                         <th scope="col">Delete</th>
                     </tr>
                     </thead>
@@ -129,8 +122,7 @@ export default function History (){
                     { trades?.map( (trade,index) =>
 
                         <tr key={index}>
-                            <th scope="row">{(new Date(trade.date)).toLocaleDateString() + ' '+ (new Date(trade.date)).getHours() + ':' +
-                            ((new Date(trade.date)).getUTCMinutes() <= 9? '0' + (new Date(trade.date)).getUTCMinutes(): (new Date(trade.date)).getUTCMinutes() ) }
+                            <th scope="row">{localeStringGlobal(trade) }
                             </th>
                             <td>
                                 <span className="text-muted">{trade.from_currency}</span>

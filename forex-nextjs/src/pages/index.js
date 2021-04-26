@@ -16,6 +16,7 @@ const md5 = require('md5');
 import axios from "axios";
 import {CLIENTS, DATABASE_URL} from "../shared/enviroment";
 import {useAppContext} from "../shared/AppWrapper";
+import {useLabels} from "../shared/labels";
 
 
 const {useState} = require("react");
@@ -59,13 +60,7 @@ export default function SignIn() {
     const classes = useStyles();
     let context = useAppContext();
     const router = useRouter();
-
-    let passwordLabel = router.locale === 'en-US' ? 'Password' : 'Senha';
-    let signupLabel = router.locale === 'en-US' ? 'Don\'t have an account? Sign Up' : 'Não tem uma conta? Criar agora!';
-    let signin = router.locale === 'en-US' ? 'Sign in' : 'Entrar';
-    let noEmailLabel = router.locale === 'en-US' ? 'No account for email' : 'Nenhuma conta com esse email';
-    let wrongPasswordLabel = router.locale === 'en-US' ? 'Wrong password' : 'Senha inválida';
-
+    let labels = useLabels().labels;
 
     let [email, setEmail] = useState('');
     let [password, setPassword] = useState('');
@@ -91,9 +86,9 @@ export default function SignIn() {
 
             //Validates the credentials
             if(res.data === 'Email wrong'){
-                alert(noEmailLabel)
+                alert(labels.noEmailLabel)
             } else if(res.data === 'Password wrong'){
-                alert(wrongPasswordLabel)
+                alert(labels.wrongPasswordLabel)
             } else {
                 localStorage.setItem('client', JSON.stringify(res.data));
                 localStorage.setItem('isLogged', 'true');
@@ -114,7 +109,7 @@ export default function SignIn() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {signin}
+                    {labels.signin}
                 </Typography>
                 <form className={classes.form} onSubmit={handleSignIn}>
                     <TextField
@@ -136,7 +131,7 @@ export default function SignIn() {
                         fullWidth
                         name="password"
                         onChange={(event) => setPassword(event.target.value)}
-                        label={passwordLabel}
+                        label={labels.passwordLabel}
                         type="password"
                         id="password"
                         autoComplete="current-password"
@@ -148,12 +143,12 @@ export default function SignIn() {
                         color="primary"
                         className={classes.submit}
                     >
-                        {signin}
+                        {labels.signin}
                     </Button>
                     <Grid container>
                         <Grid item>
                             <Link href={router.locale+'/signUp'} variant="body2">
-                                {signupLabel}
+                                {labels.signupLabel}
                             </Link>
                         </Grid>
                     </Grid>

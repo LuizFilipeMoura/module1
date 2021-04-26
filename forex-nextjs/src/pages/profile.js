@@ -16,6 +16,7 @@ import {useRouter} from "next/router";
 import {CLIENTS, DATABASE_URL} from "../shared/enviroment";
 import {useAppContext} from "../shared/AppWrapper";
 import Link from "@material-ui/core/Link";
+import {useLabels} from "../shared/labels";
 
 
 const {useState} = require("react");
@@ -45,16 +46,7 @@ export default function Profile() {
     let context = useAppContext();
     const classes = useStyles();
     let router = useRouter();
-
-    let nameLabel = router.locale === 'en-US' ? 'Name' : 'Nome';
-    let profileLabel = router.locale === 'en-US' ? 'Profile' : 'Perfil';
-    let saveLabel = router.locale === 'en-US' ? 'Save' : 'Salvar';
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ Profile saved' : '✓ Perfil salvo!';
-    let emailTakenLabel = router.locale === 'en-US' ? 'Email taken' : 'Email indisponível';
-    let invalidEmailLabel = router.locale === 'en-US' ? 'Invalid Email' : 'Email inválido';
-    let changePasswordLabel = router.locale === 'en-US' ? 'Change Password' : 'Mudar Senha';
-    let birthdateLabel = router.locale === 'en-US' ? 'Birthdate' : 'Data de nascimento';
-
+    let labels = useLabels().labels;
 
     let [showAlert, setAlert] = React.useState('');
     let [email, setEmail] = useState('');
@@ -89,10 +81,10 @@ export default function Profile() {
         //If the email is taken
         axios.post(DATABASE_URL + CLIENTS+ '/signup', user).then( res => {
             if(res.data === 'Email taken'){
-                alert(emailTakenLabel)
+                alert(labels.emailTakenLabel)
             } else {
                 if(!validateEmail(email)) {
-                    alert(invalidEmailLabel)
+                    alert(labels.invalidEmailLabel)
                 } else {
 
                     //Stores the user data if it is valid
@@ -127,7 +119,7 @@ export default function Profile() {
                     {
                         showAlert === 'success'?
                             <div className="alert alert-success" role="alert">
-                                {successTransactionLabel}
+                                {labels.successTransactionLabel}
                             </div>
                             : ''
                     }
@@ -136,7 +128,7 @@ export default function Profile() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {profileLabel}
+                    {labels.profileLabel}
                 </Typography>
                 <form className={classes.form} onSubmit={handleProfileChanging}>
                     <TextField
@@ -147,7 +139,7 @@ export default function Profile() {
                         value={name}
                         onChange={(event) => setName(event.target.value)}
                         id="name"
-                        label={nameLabel}
+                        label={labels.nameLabel}
                         name="name"
                         autoComplete="name"
                         autoFocus
@@ -175,7 +167,7 @@ export default function Profile() {
                         fullWidth
                         id="birthdate"
                         value={birthdate}
-                        label={birthdateLabel}
+                        label={labels.birthdateLabel}
                         name="birthdate"
                         autoComplete="birthdate"
                         onChange={(event) => setBirthdate(event.target.value)}
@@ -189,10 +181,10 @@ export default function Profile() {
                         color="primary"
                         className={classes.submit}
                     >
-                        {saveLabel}
+                        {labels.saveLabel}
                     </Button>
                 </form>
-                <Link href={ '/' +router.locale+ '/changePassword'} style={{color: '#FFF'}}>{changePasswordLabel}</Link>
+                <Link href={ '/' +router.locale+ '/changePassword'} style={{color: '#FFF'}}>{labels.changePasswordLabel}</Link>
             </div>
         </Container>
     );

@@ -17,6 +17,7 @@ import Container from '@material-ui/core/Container';
 import {useRouter} from "next/router";
 import {CLIENTS, DATABASE_URL} from "../shared/enviroment";
 import {useAppContext} from "../shared/AppWrapper";
+import {useLabels} from "../shared/labels";
 const md5 = require('md5');
 
 
@@ -61,18 +62,7 @@ export default function SignIn() {
     let context = useAppContext();
     const classes = useStyles();
     let router = useRouter();
-
-    let passwordLabel = router.locale === 'en-US' ? 'Password' : 'Senha';
-    let repeatPasswordLabel = router.locale === 'en-US' ? 'Repeat Password' : 'Repetir a Senha';
-    let signinLabel = router.locale === 'en-US' ? 'Already have an account? Sign Ip' : 'Já tem uma conta? Entrar agora!';
-    let nameLabel = router.locale === 'en-US' ? 'Name' : 'Nome';
-    let signup = router.locale === 'en-US' ? 'Sign Up' : 'Cadastrar';
-    let passwordNotMatchLabel = router.locale === 'en-US' ? 'Password don`t match' : 'Senhas não são estão iguais';
-    let passwordLengthLabel = router.locale === 'en-US' ? 'Password need to be at least 6 characthers long' :
-        'Senhas precisam ter pelo menos 6 caracteres';
-    let invalidEmailLabel = router.locale === 'en-US' ? 'Invalid Email' : 'Email inválido';
-    let emailTakenLabel = router.locale === 'en-US' ? 'Email taken' : 'Email indisponível';
-    let birthdateLabel = router.locale === 'en-US' ? 'Birthdate' : 'Data de nascimento';
+    let labels = useLabels().labels;
 
     let [email, setEmail] = useState('');
     let [name, setName] = useState('');
@@ -98,20 +88,20 @@ export default function SignIn() {
         //Validates the user data
         event.preventDefault();
         if(password !== repeatPassword) {
-            alert(passwordNotMatchLabel)
+            alert(labels.passwordNotMatchLabel)
         }
         else if(password.length < 6){
-            alert(passwordLengthLabel)
+            alert(labels.passwordLengthLabel)
         }
         else if(!validateEmail(email)) {
-            alert(invalidEmailLabel)
+            alert(labels.invalidEmailLabel)
         } else {
 
             //Stores the user data if it is valid
             let user = {name: name, email: email, password: md5(password), birthdate: birthdate};
             axios.post(DATABASE_URL + CLIENTS+ '/signup', user).then( res => {
                 if(res.data === 'Email taken'){
-                    alert(emailTakenLabel)
+                    alert(labels.emailTakenLabel)
                 } else {
                     router.push(router.locale+'/');
                 }
@@ -127,7 +117,7 @@ export default function SignIn() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {signup}
+                    {labels.signup}
                 </Typography>
                 <form className={classes.form} onSubmit={handleSignUp}>
                     <TextField
@@ -137,7 +127,7 @@ export default function SignIn() {
                         fullWidth
                         onChange={(event) => setName(event.target.value)}
                         id="name"
-                        label={nameLabel}
+                        label={labels.nameLabel}
                         name="name"
                         autoComplete="name"
                         autoFocus
@@ -161,7 +151,7 @@ export default function SignIn() {
                         fullWidth
                         name="password"
                         onChange={(event) => setPassword(event.target.value)}
-                        label={passwordLabel}
+                        label={labels.passwordLabel}
                         type="password"
                         id="password"
                         autoComplete="current-password"
@@ -173,7 +163,7 @@ export default function SignIn() {
                         fullWidth
                         name="password"
                         onChange={(event) => setRepeatPassword(event.target.value)}
-                        label={repeatPasswordLabel}
+                        label={labels.repeatPasswordLabel}
                         type="password"
                         id="repeatPassword"
                         autoComplete="current-password"
@@ -184,7 +174,7 @@ export default function SignIn() {
                         required
                         fullWidth
                         id="birthdate"
-                        label={birthdateLabel}
+                        label={labels.birthdateLabel}
                         name="birthdate"
                         autoComplete="birthdate"
                         onChange={(event) => setBirthdate(event.target.value)}
@@ -197,12 +187,12 @@ export default function SignIn() {
                         color="primary"
                         className={classes.submit}
                     >
-                        {signup}
+                        {labels.signup}
                     </Button>
                     <Grid container>
                         <Grid item>
                             <Link href={router.locale+'/'} variant="body2">
-                                {signinLabel}
+                                {labels.signinLabel}
                             </Link>
                         </Grid>
                     </Grid>

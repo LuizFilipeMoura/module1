@@ -16,6 +16,14 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
+import {
+    calculatesWithWallet,
+    localeStringGlobal,
+    rejectTransactionGlobal,
+    sucessfulTransactionGlobal
+} from "../shared/globalFunctions";
+import {useLabels} from "../shared/labels";
+import Alert from "../components/Alert";
 
 
 const {useState} = require("react");
@@ -43,27 +51,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Withdraw() {
     let context = useAppContext();
-
     const classes = useStyles();
-
     let router = useRouter();
-
-    let currencyLabel = router.locale === 'en-US' ? 'Currency' : 'Moeda';
-    let amountLabel = router.locale === 'en-US' ? 'Amount' : 'Montante';
-    let saveLabel = router.locale === 'en-US' ? 'Request Withdraw' : 'Requerir Saque';
-    let withdrawInstructionsLabel = router.locale === 'en-US' ? 'The deposit will be done in this following account:'
-        : 'O depósito será feito na seguinte conta:';
-    let withdrawLabel = router.locale === 'en-US' ? 'Withdraw' : 'Saque';
-    let dateLabel = router.locale === 'en-US' ? 'Date' : 'Data';
-    let bankInfoAlert = router.locale === 'en-US' ? 'Bank info are not correct' : 'Informações bancárias insuficientes';
-    let bankNumberLabel = router.locale === 'en-US' ? 'Bank Number' : 'Número do Banco';
-    let doneLabel = router.locale === 'en-US' ? 'DONE' : 'FEITO';
-    let pendingLabel = router.locale === 'en-US' ? 'PENDING' : 'PENDENTE';
-    let accountNumberLabel = router.locale === 'en-US' ? 'Account Number' : 'Número da conta';
-    let successTransactionLabel = router.locale === 'en-US' ? '✓ All Done!' : '✓ Tudo certo!';
-    let nameLabel = router.locale === 'en-US' ? 'Name: ' : 'Nome: ';
-    let failTransactionLabel = router.locale === 'en-US' ? '✘ Error! Couldn\'t afford the operation' : '✘ Erro! Saldo insuficiente ';
-
+    let labels = useLabels().labels;
 
     let [showAlert, setAlert] = React.useState('');
     let [currency, setCurrency] = useState(context.currencies[0][0]);
@@ -80,7 +70,7 @@ export default function Withdraw() {
         }
         //If the user doesn`t have valid bank info it redirects to the bank info page
         if(context.client && (!context.client.bank_number || !context.client.account_number)){
-            alert(bankInfoAlert);
+            alert(labels.bankInfoAlert);
             router.push(router.locale+'/bank-info')
         }
     });
@@ -96,38 +86,27 @@ export default function Withdraw() {
             });
     }
 
+    //Show messages
     function rejectTransaction(){
-        setAlert('fail');
-        setTimeout(function(){ setAlert(''); }, 3000);
+        rejectTransactionGlobal(setAlert);
     }
     function sucessfulTransaction(){
-        setAlert('success');
-        setTimeout(function(){ setAlert(''); }, 3000);
+        sucessfulTransactionGlobal(setAlert);
     }
 
     function handleWithdraw(event){
         event.preventDefault();
-        
+        calculatesWithWallet(currency, amount, context.wallet, rejectTransaction, success);
+    }
+
+    function success(){
         let request = {id: context.client.id, currency, amount,  status: 'DONE'};
-        
-        if(currency === 'USD' && amount > context.wallet.dollaramount){// Rejects the transaction if the user cant afford
-            rejectTransaction()
-        } else if(currency === 'BRL' && amount > context.wallet.realamount){
-            rejectTransaction()
-        }else if(currency === 'EUR' && amount > context.wallet.euroamount){
-            rejectTransaction()
-        }else if(currency === 'GBP' && amount > context.wallet.poundamount){
-            rejectTransaction()
-        } else if (!Number(amount)){
-            rejectTransaction();
-        } else {
-            //If the user can afford the withdraw, stores it in the database, The DB automatically subtracts the amount from the wallet
-            axios.put(DATABASE_URL + WITHDRAWS, request).then( res => {
-                sucessfulTransaction();
-                listWithdraws();
-                context.updateContext(context);
-            })
-        }
+        //If the user can afford the withdraw, stores it in the database, The DB automatically subtracts the amount from the wallet
+        axios.put(DATABASE_URL + WITHDRAWS, request).then( res => {
+            sucessfulTransaction();
+            listWithdraws();
+            context.updateContext(context);
+        })
     }
 
     return (
@@ -135,29 +114,17 @@ export default function Withdraw() {
             <CssBaseline />
             <div className={classes.paper}>
                 {/*    Alerts for the operation */}
-                <div className="m-2 d-flex justify-content-center align-items-center ">
-                    {
-                        showAlert === 'success'?
-                            <div className="alert alert-success" role="alert">
-                                {successTransactionLabel}
-                            </div>
-                            : showAlert === 'fail' ?
-                            <div className="alert alert-danger" role="alert">
-                                {failTransactionLabel}
-                            </div>
-                            : ''
-                    }
-                </div>
+                <Alert props={showAlert}/>
                 <Avatar className={classes.avatar}>
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {withdrawLabel}
+                    {labels.withdrawLabel}
                 </Typography>
 
 
                 <form className={classes.form} onSubmit={handleWithdraw}>
-                    <InputLabel id="demo-simple-select-label">{currencyLabel}</InputLabel>
+                    <InputLabel id="demo-simple-select-label">{labels.currencyLabel}</InputLabel>
                     <Select
                         value={currency}
                         variant="outlined"
@@ -175,7 +142,7 @@ export default function Withdraw() {
                         style={{marginTop: '15px'}}
                         variant="outlined"
                         name="input-name"
-                        label={amountLabel}
+                        label={labels.amountLabel}
                         defaultValue={0.00}
                         fullWidth
                         required
@@ -188,14 +155,14 @@ export default function Withdraw() {
                         }}
                     />
                     <div className="mt-5">
-                        <p>{withdrawInstructionsLabel}</p>
+                        <p>{labels.withdrawInstructionsLabel}</p>
                         {
                             context.client?
                                 <span>
-                                    <p>{bankNumberLabel}: {(context.client.bank_number)}</p>
+                                    <p>{labels.bankNumberLabel}: {(context.client.bank_number)}</p>
 
-                                    <p>{accountNumberLabel}: {(context.client.account_number)}</p>
-                                    <p>{nameLabel}{context.client.name?.toUpperCase()}</p>
+                                    <p>{labels.accountNumberLabel}: {(context.client.account_number)}</p>
+                                    <p>{labels.nameLabel}{context.client.name?.toUpperCase()}</p>
                                 </span> : ''
                         }
 
@@ -208,56 +175,37 @@ export default function Withdraw() {
                         color="primary"
                         className={classes.submit}
                     >
-                        {saveLabel}
+                        {labels.saveLabel}
                     </Button>
                 </form>
 
             </div>
             <div className=" mt-5 mb-5 w-100" >
 
-                {/*List all the withdraws*/}
+            {/*    /!*List all the withdraws*!/*/}
 
                 {withdraws?.map(withdraw =>
+                      <div className="d-flex justify-content-center align-items-center" >
+                          <div className={withdraw.status === 'DONE' ? 'alert alert-success w-100' : 'alert alert-danger w-100' } >
+                            <p>{labels.withdrawLabel} {labels.doneLabel}</p> <strong>
+                            <p>{labels.amountLabel}: {withdraw.amount}</p>
+                            <p>{labels.currencyLabel}: {withdraw.currency}</p>
 
-                    <div className="d-flex justify-content-center align-items-center" >
-                        {withdraw.status === 'DONE'?
-                            <div className="alert alert-success w-100" role="alert">
-                                <p>{withdrawLabel} {doneLabel}</p> <strong>
-                                <p>{amountLabel}: {withdraw.amount}</p>
-                                <p>{currencyLabel}: {withdraw.currency}</p>
                             </strong>
-                                <p>{dateLabel}: {(new Date(withdraw.date)).toLocaleDateString() + ' '+ (new Date(withdraw.date)).getHours() + ':' +
-                                ((new Date(withdraw.date)).getUTCMinutes() <= 9? '0' + (new Date(withdraw.date)).getUTCMinutes(): (new Date(withdraw.date)).getUTCMinutes() ) }</p>
+                                <p>{localeStringGlobal(withdraw)}</p>
+                                {/*Translates the obs */}
+
                                 {withdraw.obs && withdraw.obs !== '' ?
                                     <p>{router.locale === 'en-US' ?  withdraw.obs : withdraw.obs?.toString()
                                         .replace('SENT', 'ENVIADO')
                                         .replace('BY', 'POR')
                                         .replace('TO', 'PARA')}</p>: ''}
 
-                            </div>
-                            :
-                            <div className="alert alert-danger w-100" role="alert">
-                                <p>{withdrawLabel} {pendingLabel}</p> <strong>
-                                <p>{amountLabel}: {withdraw.amount}</p>
-                                <p>{withdraw.currency}</p>
-                            </strong>
-                                <p>{dateLabel}: {(new Date(withdraw.date)).toLocaleDateString() + ' '+ (new Date(withdraw.date)).getHours() + ':' +
-                                ((new Date(withdraw.date)).getUTCMinutes() <= 9? '0' + (new Date(withdraw.date)).getUTCMinutes(): (new Date(withdraw.date)).getUTCMinutes() ) }</p>
-                                {withdraw.obs && withdraw.obs !== '' ?
-                                    <p>{router.locale === 'en-US' ?  withdraw.obs : withdraw.obs?.toString()
-                                        .replace('SENT', 'ENVIADO')
-                                        .replace('BY', 'POR')
-                                        .replace('TO', 'PARA')}</p>: ''}
-                            </div>
-                        }
-
-                    </div>
-
-
+                        </div>
+                      </div>
                 )}
 
             </div>
-
         </Container>
-    );
-}
+    )
+};
