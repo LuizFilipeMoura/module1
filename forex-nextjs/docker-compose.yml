@@ -62,6 +62,8 @@ services:
     networks:
       - my-network
     restart: unless-stopped
+    depends_on:
+      - pgtest
 
 networks:
   my-network:
