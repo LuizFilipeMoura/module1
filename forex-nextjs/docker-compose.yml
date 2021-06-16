@@ -4,9 +4,7 @@ version: "3"
 
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: web
     container_name: web
     restart: always
     networks:
@@ -19,7 +17,7 @@ services:
       - 3000:3000
 
   pgtest:
-    image: pg
+    image: pgtest
     container_name: pgtest
     networks:
       - my-network

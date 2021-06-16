@@ -15,6 +15,10 @@ WORKDIR /app/nextjs
 COPY package*.json /app/nextjs
 
 # Install dependencies in /app/nextjs
+RUN apk update && apk add --virtual build-dependencies build-base gcc wget git
+
+RUN apk add --update --no-cache curl py-pip
+
 RUN npm install
 
 # Copy the rest of our Next.js folder into /app/nextjs
