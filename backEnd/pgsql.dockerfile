@@ -3,11 +3,8 @@ FROM ubuntu:16.04
 
 RUN mkdir -p /pg
 
-# Set /app/nextjs as the working directory
 WORKDIR /pg
 
-# Copy package.json and package-lock.json
-# to the /app/nextjs working directory
 COPY forex.sql /pg
 
 RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
