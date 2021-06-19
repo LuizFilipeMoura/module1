@@ -16,7 +16,7 @@ wss.on('connection', function connection(ws) {
     console.log('Conected');
 
     if(ws){
-        getLastest();
+        // getLastest();
         ws.send(JSON.stringify(infoBundle));
     }
 

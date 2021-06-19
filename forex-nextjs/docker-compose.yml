@@ -3,18 +3,18 @@
 version: "3"
 
 services:
-  web:
-    image: web
-    container_name: web
-    restart: always
-    networks:
-      - my-network
-    volumes:
-      - ./:/appNext
-      - /appNext/node_modules
-      - /appNext/.next
-    ports:
-      - 3000:3000
+#  web:
+#    image: web
+#    container_name: web
+#    restart: always
+#    networks:
+#      - my-network
+#    volumes:
+#      - ./:/appNext
+#      - /appNext/node_modules
+#      - /appNext/.next
+#    ports:
+#      - 3000:3000
 
   pgtest:
     image: pgtest
