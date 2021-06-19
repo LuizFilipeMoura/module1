@@ -35,7 +35,7 @@ let schedueler = function(ws) {
     setInterval(function(){
 
         if(ws){
-            getLastest();
+            // getLastest();
             ws.send(JSON.stringify(infoBundle));
         }
 
