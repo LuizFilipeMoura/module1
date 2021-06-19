@@ -16,7 +16,7 @@ wss.on('connection', function connection(ws) {
     console.log('Conected');
 
     if(ws){
-        // getLastest();
+        getLastest();
         ws.send(JSON.stringify(infoBundle));
     }
 
@@ -24,18 +24,18 @@ wss.on('connection', function connection(ws) {
 });
 
 //Access the trading rate API
-// const getLastest = ()=> oxr.latest(function(error) {
-//     infoBundle.usdTOgbp = oxr.rates['GBP'];
-//     infoBundle.usdTOeur = oxr.rates['EUR'];
-//     infoBundle.usdTObrl = oxr.rates['BRL'];
-// });
+const getLastest = ()=> oxr.latest(function(error) {
+    infoBundle.usdTOgbp = oxr.rates['GBP'];
+    infoBundle.usdTOeur = oxr.rates['EUR'];
+    infoBundle.usdTObrl = oxr.rates['BRL'];
+});
 
 //Set the interval to maintain the value as realtime as possible
 let schedueler = function(ws) {
     setInterval(function(){
 
         if(ws){
-            // getLastest();
+            getLastest();
             ws.send(JSON.stringify(infoBundle));
         }
 
