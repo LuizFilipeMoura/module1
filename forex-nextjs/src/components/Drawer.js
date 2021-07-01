@@ -46,7 +46,7 @@ const DrawerList = ({props}) => {
         <>
             <div
                 className={clsx(classes.list, {
-                    [classes.fullList]: 'right' === 'top' || 'right' === 'bottom',
+                    [classes.fullList]: 'left' === 'top' || 'left' === 'bottom',
                 })}
                 role="presentation"
             >
