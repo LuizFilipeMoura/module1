@@ -61,6 +61,10 @@ export default function Withdraw() {
     let [withdraws, setWithdraws] = useState();
 
     useEffect(() => {
+        if(context.client && (!context.client.bank_number || !context.client.account_number)){
+            alert(labels.bankInfoAlert);
+            router.push(router.locale+'/bankInfo')
+        }
         //List All the withdraws fot that client
         if(!withdraws){
             listWithdraws();
@@ -69,10 +73,7 @@ export default function Withdraw() {
             router.push(router.locale+'/')
         }
         //If the user doesn`t have valid bank info it redirects to the bank info page
-        if(context.client && (!context.client.bank_number || !context.client.account_number)){
-            alert(labels.bankInfoAlert);
-            router.push(router.locale+'/bankInfo')
-        }
+
     });
 
     function listWithdraws(){//Lists the withdraws on the dataBase for that client
