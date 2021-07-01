@@ -3,7 +3,6 @@ import React, {useEffect} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
 import axios from "axios";
 import 'date-fns';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -17,7 +16,6 @@ import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import CurrencyTextField from "@unicef/material-ui-currency-textfield";
-import {number} from "prop-types";
 import {localeStringGlobal} from "../shared/globalFunctions";
 import {useLabels} from "../shared/labels";
 
