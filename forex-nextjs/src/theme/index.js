@@ -11,7 +11,9 @@ const theme = createMuiTheme({
         },
         primary: {
 
+
             main: '#FCC0CB',
+
 
         },
         secondary: {
