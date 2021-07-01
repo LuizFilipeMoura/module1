@@ -9,21 +9,41 @@ export function sucessfulTransactionGlobal(setAlert){
     setTimeout(function(){ setAlert(''); }, 3000);
 }
 
+
+
+
 export function calculatesWithWallet(currency, amount, wallet, fnReject, fnSuccess){
 
-    if(currency === 'USD' && amount > wallet.dollaramount){// Rejects the transaction if the user cant afford
-        fnReject()
-    } else if(currency === 'BRL' && amount > wallet.realamount){
-        fnReject()
-    }else if(currency === 'EUR' && amount > wallet.euroamount){
-        fnReject()
-    }else if(currency === 'GBP' && amount > wallet.poundamount){
-        fnReject()
-    } else if (!Number(amount)){
-        fnReject();
-    } else{
-        fnSuccess()
-    }
+    switch(currency) {
+        case 'USD':
+          if (amount > wallet.dollaramount) {
+              fnReject();
+          }
+          break;
+        case 'BRL':
+          if (amount > wallet.realamount){
+              fnReject();
+          }
+          break;
+        case 'EUR':
+            if (amount > wallet.realamount){
+                fnReject();
+            }
+            break;
+        case 'GBP':
+            if (amount > wallet.poundamount){
+                fnReject();
+            }
+            break;
+
+        default:
+            if (!Number(amount)){
+                fnReject();
+            }
+            else {
+            fnSuccess();
+            }
+      }
 }
 
 export function updatesWalletGlobal(givenTransaction, wallet){ // Updates the wallet values for each currency
