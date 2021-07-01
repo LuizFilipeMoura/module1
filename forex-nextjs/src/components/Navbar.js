@@ -44,8 +44,8 @@ const Navbar = ({currencies, wallet, client}) => {
             <div className="m-2 row ">
                 {}
                 <React.Fragment >
-                    <Button onClick={toggleDrawer('right', true)}>{client?.name}</Button>
-                    <Drawer anchor='right' open={state['right']} onClose={toggleDrawer('right', false)} classes={{paper: classes.paper}}>
+                    <Button onClick={toggleDrawer('left', true)}>{client?.name}</Button>
+                    <Drawer anchor='left' open={state['left']} onClose={toggleDrawer('left', false)} classes={{paper: classes.paper}}>
                         <DrawerList/>
                     </Drawer>
                 </React.Fragment>
