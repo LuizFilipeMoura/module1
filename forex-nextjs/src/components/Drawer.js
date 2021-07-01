@@ -55,17 +55,17 @@ const DrawerList = ({props}) => {
                     {}
                     {/*Go through all the options available inside the drawer*/}
 
-                    {[profileLabel, bankInfoLabel, historyLabel, withdrawLabel, depositLabel, dashboardLabel,sendMoneyLabel, chargeMoneyLabel, accountBalanceLabel, logoutLabel].map((text, index) => (
+                    {[profileLabel, bankInfoLabel, sendMoneyLabel, depositLabel, dashboardLabel,withdrawLabel, chargeMoneyLabel, accountBalanceLabel, historyLabel,logoutLabel].map((text, index) => (
                         <ListItem button key={text} onClick={()=>
 
                             {router.push({ pathname: router.locale +'/' + (index === 0 ? 'profile'
                                 : index === 1 ? 'bankInfo'
-                                    : index === 2 ? 'history'
-                                        : index === 3 ? 'withdraw'
+                                    : index === 2 ? 'chargeForMoney'
+                                        : index === 3 ? 'sendmoney'
                                             : index === 4 ? 'deposit'
                                                 : index === 5 ? 'dashboard'
-                                                    : index === 6 ? `sendmoney`
-                                                        : index === 7 ? 'chargeForMoney'
+                                                    : index === 6 ? `withdraw`
+                                                        : index === 7 ? 'history'
                                                                 : index === 8 ? 'accountBalance'
                                                             : '')
                             });
@@ -73,13 +73,13 @@ const DrawerList = ({props}) => {
                             <ListItemIcon>
                                 {index === 0 ? <AccountCircleIcon />
                                     : index === 1 ? <AccountBalanceIcon />
-                                        : index === 2 ? <HistoryIcon/>
+                                        : index === 2 ? <SendIcon/>
                                             : index === 3 ? <MonetizationOnIcon/>
                                                 : index === 4 ? <AttachMoneyIcon/>
                                                     : index === 5 ?<DashboardIcon/>
-                                                        : index === 6 ?<SendIcon/>
+                                                        : index === 6 ?<AccountBalanceIcon/>
                                                             : index === 7 ?<MoneyIcon/>
-                                                                : index === 8 ?<AccountBalanceWalletIcon/>
+                                                                : index === 8 ?<HistoryIcon/>
                                                                 : <ExitToAppIcon/>
 
                                 }
