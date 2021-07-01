@@ -33,6 +33,8 @@ docker-compose up
 
 
 CONFIGURAÇÃO DO PGMYADMIN 4
+**(caso necessário poderá ser usado o PGADMIN 3)
+
 
 Acesse a página aberta pelo PgMyAdmin 4 (por padrão é o endereço http://127.0.0.1/), as credenciais são 
 email: user@domain.com 
