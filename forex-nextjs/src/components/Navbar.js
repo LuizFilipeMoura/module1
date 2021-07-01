@@ -51,12 +51,15 @@ const Navbar = ({currencies, wallet, client}) => {
                 </React.Fragment>
 
             {/*    Show the amount of each currency*/}
+            {/*    Mostrar montante de cada moeda*/}
             {currencies? currencies.map((currency) => (
                 <div className="m-2" key={currency[0]}>
                     <p className="h5" key={currency[0]}>
                         {/*Gets the symbol*/}
+                        {/*Obter simbolos*/}
                         <small key={currency[0]}>{currency[1]}</small>
                         {/*Gets the value on the wallet*/}
+                        {/*Obter valor na carteira*/}
                         {wallet[currency[2]+'amount']?.toFixed(2)}
                     </p>
                 </div>
